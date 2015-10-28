@@ -1,0 +1,10 @@
+{
+  "name": "FloorFest",
+  "version": "0.0.0",
+  "description": "FloorFest",
+  "main": "app.js",
+  "author": {
+    "name": "rikmu",
+    "email": ""
+  }
+}

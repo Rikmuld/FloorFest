@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename source folder &apos;FloorFest/src&apos; to &apos;common&apos;&#x0D;&#x0A;- Original project: &apos;FloorFest&apos;&#x0D;&#x0A;- Original element: &apos;FloorFest/src&apos;&#x0D;&#x0A;- Renamed element: &apos;src&apos;" description="Rename source folder &apos;src&apos;" id="org.eclipse.jdt.ui.rename.source.folder" input="/src" name="common" stamp="1446042238084" version="1.0"/>
+</session>
