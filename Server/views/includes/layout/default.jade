@@ -1,0 +1,18 @@
+﻿extends document.jade
+
+block scripts
+    include ../scripts.jade
+block styles
+    include ../styles.jade
+
+block title
+    title Floor Fest
+
+block body
+    .wrapper
+        #header
+            block header
+        #content
+            block contents
+        #footer
+            block footer

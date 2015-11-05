@@ -1,0 +1,10 @@
+﻿mixin but(number)
+    button.btn.btn-default(type="button" onclick="javascript:setNumOfPlayers("+ number +")")= number
+
+.centerbox
+    p#accessText Hoeveel spelers zijn er?
+    .btn-group.btn-group-lg(role="group" aria-label="players")
+        +but(1)
+        +but(2)
+        +but(3)
+        +but(4)

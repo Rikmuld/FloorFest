@@ -1,0 +1,23 @@
+﻿extends ./includes/layout/default.jade
+
+mixin turn(style)
+    .turnDevice(style=style)
+        img(src="/image/deviceTurn.png")
+        p draai uw device als aangegeven
+
+mixin loader()
+    .loader
+        .load
+        .progress
+
+block append contents
+    #landscape.diIntro
+        .centerbox
+            .container
+                p#accessText
+            #intro
+                +turn()
+                +loader()
+    #portrait.hiIntro
+        .centerbox
+            +turn('margin-top:-10px')

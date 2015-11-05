@@ -1,0 +1,72 @@
+﻿@import 'helper.styl'
+@import 'global.styl'
+
+.wrapper
+	min-height 100%
+	width 100%
+	position relative
+	overflow auto
+
+body, html
+	height 100%
+
+#footer
+	position absolute
+
+#header
+	position absolute
+
+#content, #landscape, #portrait
+	height 100%
+	width: 100%
+	position absolute
+
+.centerbox
+	@extends .alCenter
+	@extends .yAlign
+
+#accessText
+	font-size 3vw
+	font-family exo
+	color: #222
+
+.turnDevice
+	width 100%
+	height 100%
+	p
+		font-size 3vw
+		@media only screen and (orientation:portrait)
+			font-size 5vw
+		@media only screen and (orientation:landscape)
+			font-size 3vw
+		font-family exo
+		color: #222
+		margin-top: 20px
+	img
+		width 450px
+
+.loadbar
+	@extends .center
+	height 10px
+	border-radius 5px
+
+.load
+	@extends .loadbar
+	width 60vw
+	margin-top 20px
+	background-color rgba(0, 0, 0, 0.1)
+
+.progress
+	@extends .loadbar
+	width 0vw
+	margin-top -10px
+	background-color rgba(127, 127, 127, 0.2)
+
+@media only screen and (orientation:portrait){
+    #landscape { display:none; }
+    #portrait { display:block; }
+}
+@media only screen and (orientation:landscape){
+    #portrait{ display:none; }
+    #landscape { display:block; }
+}
