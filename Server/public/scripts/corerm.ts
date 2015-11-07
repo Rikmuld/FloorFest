@@ -1203,6 +1203,41 @@ class Camera {
     }
 }
 
+module MMath {
+    var SEED: number = 0;
+    var TO_RAD: number = (Math.PI * 2) / 360;
+    var TO_DEG: number = 360 / (Math.PI * 2);
+
+    export function setRandomSeed(seed: number) {
+        SEED = seed;
+    }
+
+    export function random(): number;
+    export function random(min: number, max: number): number;
+    export function random(min?: number, max?: number): number {
+        var floor:boolean = typeof min != 'undefined';
+        if (typeof min == 'undefined') {
+            min = 0;
+            max = 1;
+        }
+
+        SEED = (SEED * 9301 + 49297) % 233280;
+        var rnd = SEED / 233280;
+
+        var retVal = min + rnd * (max - min);
+        return floor ? Math.floor(retVal) : retVal;
+    }
+
+    export function toRad(deg: number): number {
+        return deg * TO_DEG;
+    }
+
+    export function toDeg(rad: number): number {
+        return rad * TO_RAD;
+    }
+}
+
+
 module GLF {
     export function clearBufferColor() {
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -1440,6 +1475,7 @@ class List<Item> {
 
     constructor(...items: Item[]) {
         if (typeof items != 'undefined' && items.length > 0) this.data = items;
+        else this.data = [];
     }
 
     isEmpty(): boolean {
@@ -1509,12 +1545,6 @@ class MutableList<Item> extends List<Item> {
 
 class Queue<Item> extends List<Item> {
     private low: number = 0;
-
-    constructor(...items: Item[]) {
-        super();
-
-        if (typeof items != 'undefined') this.data = items;
-    }
 
     size(): number {
         return super.size() - this.low;
