@@ -565,6 +565,8 @@ class Keyboard {
     static KEY_X = 88;
     static KEY_Y = 89;
     static KEY_Z = 90;
+    static KEY_RETURN = 13;
+    static KEY_SPACE = 32;
 
     static listenForKeysCustom(keyDown, keyUp) {
         document.onkeydown = keyDown;
@@ -1531,6 +1533,9 @@ class MutableList<Item> extends List<Item> {
     }
     removeAt(index: number): Item {
         return this.data.splice(index, 1)[0];
+    }
+    replace(index, number, item: Item) {
+        this.data[index] = item;
     }
     indexOf(item: Item): number {
         return this.data.indexOf(item);

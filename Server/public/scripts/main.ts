@@ -9,10 +9,13 @@ module Play {
     var GREEN = [0, 255, 0];
     var BLUE = [0, 0, 255];
 
+    export var ZONES = 10;
+
     var colors = new List<Vec3>(RED, GREEN, BLUE);
     var currentSong: Queue<MusicEvent>;
     var currentMusic: AudioObj;
 
+    var noteSpeed: number;
     var currTime: number;
     var song: string;
     var score: number;
@@ -26,16 +29,22 @@ module Play {
         if (currentMusic != null) return;
 
         DummyFF.createDummy();
-
-        currentMusic = audio.getAudio(name);
-        currentMusic.play();
+        Keyboard.listenForKeysCustom(keyDown, null);
 
         currTime = 0;
 
         readFile("music/" + name + ".ff", function (music) {
+            currentMusic = audio.getAudio(name);
             currentSong = loadSong(music, numOfPlayers);
+            currentMusic.play();
             run(null);
         });
+    }
+
+    function keyDown(event) {
+        if (event.keyCode == Keyboard.KEY_SPACE) {
+            //console.log(Math.floor(currentMusic.time()*10));
+        }
     }
 
     export function kill() {
@@ -46,32 +55,80 @@ module Play {
     }
 
     function run(event: MusicEvent) {
+        if (currentMusic == null) return;
+
         if (event != null) {
             FFInterface.powerZone(event.color, event.zone)
-            setTimeout(function () { FFInterface.releaseZone(event.zone) }, 2000)
+            setTimeout(function () { FFInterface.releaseZone(event.zone) }, noteSpeed*100)
         }
-
-        var eventNext = currentSong.dequeue();
 
         if (currentMusic.audio.ended) {
             cencelMusic();
             return;
         }
 
+        var eventNext = currentSong.dequeue();
         currTime = Math.floor(10 * currentMusic.time());
-        setTimeout(function () { run(eventNext) }, (eventNext.time - currTime) * 100);
+        if (eventNext == null || typeof eventNext == "undefined") setTimeout(function () { run(null) }, 1000);
+
+        var sleepTime = (eventNext.time - currTime) * 100;
+        setTimeout(function () { run(eventNext) }, sleepTime);
     }
 
     function loadSong(music: string, players: number): Queue<MusicEvent> {
-        var musicData = music.split(",");
+        var options = music.split("&");
+
+        var speed: string = decompOptions(options, MusicOptions.SPEED);
+        var notes: string = decompOptions(options, MusicOptions.NOTES);
+
+        noteSpeed = parseInt(speed);
+
+        var musicData = notes.split(",");
         var musc = new Queue<MusicEvent>();
         var seed = 5 * music.length + 3 * music.indexOf("a") + 4 * music.indexOf("o") + 2 * music.indexOf("u") + 7 * music.indexOf("i") + 3 * music.indexOf("e");
         MMath.setRandomSeed(seed);
 
+        var busy: number[] = new Array(players);
+        var occupied: number[] = new Array(ZONES);
+
         for (var i = 0; i < musicData.length; i++) {
-            musc.enqueue(new MusicEvent(parseInt(musicData[i]), MMath.random(0, 10), MMath.random(0, numOfPlayers)));
+            var time = parseInt(musicData[i]);
+            var player = getPlayer(busy, players, time);
+            var zone = getZone(occupied, time);
+
+            musc.enqueue(new MusicEvent(time, zone, player));
+
+            busy[player] = time + (noteSpeed*4)/3;
+            occupied[zone] = time + (noteSpeed*4)/3;
         }
         return musc;
+    }
+
+    function getZone(occupied: number[], time:number):number {
+        var zoneQuess = MMath.random(0, ZONES);
+        if (occupied[zoneQuess] >= time || occupied[numToFrame(zoneQuess + 1, ZONES)] >= time || occupied[numToFrame(zoneQuess - 1, ZONES)] >= time) return getZone(occupied, time);
+        return zoneQuess;
+    }
+
+    function getPlayer(busy: number[], players:number, time:number):number {
+        var playerGuess = MMath.random(0, players);
+        if (busy[playerGuess] >= time) return getPlayer(busy, players, time);
+        return playerGuess;
+    }
+
+    function decompOptions(options: string[], option: MusicOptions): string {
+        var split: string;
+
+        if (option == MusicOptions.SPEED) split = "s=";
+        if (option == MusicOptions.NOTES) split = "n=";
+
+        return options.filter((value: string, index: number, array: string[]): boolean => {
+            return value.split(split).length == 2;
+        })[0].split(split)[1];
+    }
+
+    enum MusicOptions {
+        NOTES, SPEED
     }
 
     class MusicEvent {
@@ -80,8 +137,6 @@ module Play {
         color: Colour;
 
         constructor(time: number, zone: number, player: number) {
-            console.log(player)
-
             this.time = time;
             this.zone = zone;
             this.color = getColor(player);
@@ -90,6 +145,10 @@ module Play {
 
     function getColor(player: number) {
         return colors.apply(player);
+    }
+
+    function numToFrame(num: number, max: number): number {
+        return ((num % max) + max) % max;
     }
 }
 
@@ -103,7 +162,7 @@ module DummyFF {
 
     var render: QuickGL.SIPRender;
     var shader: Shader;
-    var STRIP_COUNT = 10;
+    var STRIP_COUNT = Play.ZONES;
 
     export function createDummy() {
         QuickGL.initGL(setup, loop, window.innerWidth - 300, 0, 300, 300, [0, 0, 0, 1]);
@@ -144,7 +203,7 @@ module DummyFF {
  * Connects the program to light output, is for now connected to the DummyFF.
  */
 module FFInterface {
-    var NUM_ZONES = 10;
+    var NUM_ZONES = Play.ZONES;
 
     export function powerZone(color: Vec3, zone: number) {
         DummyFF.setColor(color, zone);
@@ -157,7 +216,7 @@ module FFInterface {
     }
 
     function numToFrame(num: number, max: number): number {
-        return num % max;
+        return ((num % max) + max) % max;
     }
 }
 
