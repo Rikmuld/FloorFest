@@ -90,29 +90,37 @@ module Play {
 
         var busy: number[] = new Array(players);
         var occupied: number[] = new Array(ZONES);
+        var currLoc: number[] = new Array(players);
 
         for (var i = 0; i < musicData.length; i++) {
             var time = parseInt(musicData[i]);
-            var player = getPlayer(busy, players, time);
-            var zone = getZone(occupied, time);
+            var zone = getZone(occupied, currLoc, time, 0);
+            var player = zone==-1? -1:getPlayer(busy, players, time, 0);
 
-            musc.enqueue(new MusicEvent(time, zone, player));
+            if (player >= 0) {
+                musc.enqueue(new MusicEvent(time, zone, player));
 
-            busy[player] = time + (noteSpeed*4)/3;
-            occupied[zone] = time + (noteSpeed*4)/3;
+                busy[player] = time + (noteSpeed * (players == 1 ? 1 : (4 / 3)));
+                currLoc[player] = zone;
+
+                occupied[zone] = time + (noteSpeed * 4)/3;
+            }
         }
         return musc;
     }
 
-    function getZone(occupied: number[], time:number):number {
+    function getZone(occupied: number[], currLoc: number[], time: number, ittrs: number): number {
+        if (ittrs == 100) return -1;
         var zoneQuess = MMath.random(0, ZONES);
-        if (occupied[zoneQuess] >= time || occupied[numToFrame(zoneQuess + 1, ZONES)] >= time || occupied[numToFrame(zoneQuess - 1, ZONES)] >= time) return getZone(occupied, time);
+        if (currLoc.indexOf(zoneQuess) >= 0) return getZone(occupied, currLoc, time, ittrs + 1);
+        if (occupied[zoneQuess] >= time || occupied[MMath.mod(zoneQuess + 1, ZONES)] >= time || occupied[MMath.mod(zoneQuess - 1, ZONES)] >= time) return getZone(occupied, currLoc, time, ittrs+1);
         return zoneQuess;
     }
 
-    function getPlayer(busy: number[], players:number, time:number):number {
+    function getPlayer(busy: number[], players: number, time: number, ittrs: number):number {
+        if (ittrs == 100) return -1;
         var playerGuess = MMath.random(0, players);
-        if (busy[playerGuess] >= time) return getPlayer(busy, players, time);
+        if (busy[playerGuess] > time) return getPlayer(busy, players, time, ittrs+1);
         return playerGuess;
     }
 
@@ -146,10 +154,6 @@ module Play {
     function getColor(player: number) {
         return colors.apply(player);
     }
-
-    function numToFrame(num: number, max: number): number {
-        return ((num % max) + max) % max;
-    }
 }
 
 /*
@@ -175,17 +179,13 @@ module DummyFF {
         render = new QuickGL.SIPRender(shader, QuickGL.StartType.ONCE);
 
         for (var i = 0; i < STRIP_COUNT; i++) {
-            lines.insert(Geometry.line(Geometry.point(150 + Math.cos(toRad(i * (360 / STRIP_COUNT))) * 10, 150 + Math.sin(toRad(i * (360 / STRIP_COUNT))) * 10),
-                Geometry.point(150 + Math.cos(toRad(i * (360 / STRIP_COUNT))) * 125, 150 + Math.sin(toRad(i * (360 / STRIP_COUNT))) * 125)));
+            lines.insert(Geometry.line(Geometry.point(150 + Math.cos(MMath.toRad(i * (360 / STRIP_COUNT))) * 10, 150 + Math.sin(MMath.toRad(i * (360 / STRIP_COUNT))) * 10),
+                Geometry.point(150 + Math.cos(MMath.toRad(i * (360 / STRIP_COUNT))) * 125, 150 + Math.sin(MMath.toRad(i * (360 / STRIP_COUNT))) * 125)));
         }
     }
 
     export function setColor(nwColor: Vec3, index: number) {
         color[index] = nwColor;
-    }
-
-    function toRad(deg: number): number {
-        return (deg / 360) * 2 * Math.PI;
     }
 
     function loop() {
@@ -207,16 +207,12 @@ module FFInterface {
 
     export function powerZone(color: Vec3, zone: number) {
         DummyFF.setColor(color, zone);
-        DummyFF.setColor(color, numToFrame(zone + 1, NUM_ZONES));
+        DummyFF.setColor(color, MMath.mod(zone + 1, NUM_ZONES));
     }
 
     export function releaseZone(zone: number) {
         DummyFF.setColor(null, zone);
-        DummyFF.setColor(null, numToFrame(zone + 1, NUM_ZONES));
-    }
-
-    function numToFrame(num: number, max: number): number {
-        return ((num % max) + max) % max;
+        DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
     }
 }
 
