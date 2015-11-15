@@ -23,6 +23,7 @@ module Play {
 
     export function setNumOfPlayers(players: number) {
         numOfPlayers = players;
+        setText(PLAYER_DISP, players.toString())
     }
 
     export function playMusic(name: string) {
@@ -32,13 +33,17 @@ module Play {
         Keyboard.listenForKeysCustom(keyDown, null);
 
         currTime = 0;
+        currentMusic = audio.getAudio(name);
 
-        readFile("music/" + name + ".ff", function (music) {
-            currentMusic = audio.getAudio(name);
-            currentSong = loadSong(music, numOfPlayers);
-            currentMusic.play();
-            run(null);
-        });
+        loadMusicFile("music/" + name + ".ff");
+    }
+
+    export function musicFileCalback(music: string) {
+        console.log(numOfPlayers)
+        currentSong = loadSong(music, numOfPlayers);
+        currentMusic.play();
+        console.log(currentSong)
+        run(null);
     }
 
     function keyDown(event) {
@@ -55,6 +60,7 @@ module Play {
     }
 
     function run(event: MusicEvent) {
+        console.log(event)
         if (currentMusic == null) return;
 
         if (event != null) {
@@ -70,9 +76,10 @@ module Play {
         var eventNext = currentSong.dequeue();
         currTime = Math.floor(10 * currentMusic.time());
         if (eventNext == null || typeof eventNext == "undefined") setTimeout(function () { run(null) }, 1000);
-
-        var sleepTime = (eventNext.time - currTime) * 100;
-        setTimeout(function () { run(eventNext) }, sleepTime);
+        else {
+            var sleepTime = (eventNext.time - currTime) * 100;
+            setTimeout(function () { run(eventNext) }, sleepTime);
+        }
     }
 
     function loadSong(music: string, players: number): Queue<MusicEvent> {
@@ -80,7 +87,6 @@ module Play {
 
         var speed: string = decompOptions(options, MusicOptions.SPEED);
         var notes: string = decompOptions(options, MusicOptions.NOTES);
-
         noteSpeed = parseInt(speed);
 
         var musicData = notes.split(",");
@@ -169,7 +175,7 @@ module DummyFF {
     var STRIP_COUNT = Play.ZONES;
 
     export function createDummy() {
-        QuickGL.initGL(setup, loop, window.innerWidth - 300, 0, 300, 300, [0, 0, 0, 1]);
+        QuickGL.initGL(setup, loop, window.innerWidth - 325, 75, 300, 300, [0, 0, 0, 1]);
     }
 
     function setup() {
@@ -177,6 +183,7 @@ module DummyFF {
         shader.matrix.setProjectionMatrix(Matrix4.ortho(0, 300, 300, 0));
 
         render = new QuickGL.SIPRender(shader, QuickGL.StartType.ONCE);
+        lines.clear();
 
         for (var i = 0; i < STRIP_COUNT; i++) {
             lines.insert(Geometry.line(Geometry.point(150 + Math.cos(MMath.toRad(i * (360 / STRIP_COUNT))) * 10, 150 + Math.sin(MMath.toRad(i * (360 / STRIP_COUNT))) * 10),
@@ -192,6 +199,7 @@ module DummyFF {
         GLF.clearBufferColor();
         for (var i = 0; i < lines.size(); i++) {
             var nwColor = color[i];
+            console.log(nwColor)
             if (nwColor == null) nwColor = [1, 1, 1];
             render.setColorV3(nwColor);
             render.line(lines.apply(i));
@@ -206,6 +214,7 @@ module FFInterface {
     var NUM_ZONES = Play.ZONES;
 
     export function powerZone(color: Vec3, zone: number) {
+        console.log(color, zone)
         DummyFF.setColor(color, zone);
         DummyFF.setColor(color, MMath.mod(zone + 1, NUM_ZONES));
     }
@@ -280,6 +289,7 @@ var O_FRAME_REQUEST = "frame_request"
 var I_FRAME_RESPONS = "frame_respons"
 var I_MUSIC_START = "music_start"
 var O_MUSIC_SET = "music_set"
+var I_PLAYER_SET_CLIENT = "player_set_client"
 var O_PLAYER_SET = "player_set"
 var O_READ_FILE = "file_read"
 var I_READ_FILE = "file_read_get"
@@ -291,10 +301,11 @@ var access: boolean = false;
 socket.on(I_ACCESS_RESPONSE, responseAccess)
 socket.on(I_FRAME_RESPONS, responseFrame)
 socket.on(I_MUSIC_START, Play.playMusic)
+socket.on(I_READ_FILE, Play.musicFileCalback)
+socket.on(I_PLAYER_SET_CLIENT, Play.setNumOfPlayers)
 
-function readFile(name: string, callback:(html)=>void) {
+function loadMusicFile(name: string) {
     socket.emit(O_READ_FILE, name)
-    socket.on(I_READ_FILE, callback)
 }
 
 function requestAccess() {
@@ -319,11 +330,10 @@ function responseFrame(id:string, frame) {
  */
 
 function openSettings() {
-    requestFrame(FRAME_PLAYER);
+    if (access && currentFrame == FRAME_SELECT) requestFrame(FRAME_PLAYER);
 }
 
 function setNumOfPlayers(players: number) {
-    Play.setNumOfPlayers(players);
     socket.emit(O_PLAYER_SET, players);
     requestFrame(FRAME_SELECT);
 }
@@ -352,6 +362,7 @@ var LOAD_PROGRESS = ".progress";
 var INTRO_SHOW = ".diIntro";
 var INTRO_HIDE = ".hiIntro";
 var FRAME = "#landscape";
+var PLAYER_DISP = ".playerDisp";
 
 function setText(id: string, text: string) {
     $(id).text(text);

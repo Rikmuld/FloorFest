@@ -1,34 +1,81 @@
 ﻿@import 'helper.styl'
 @import 'global.styl'
 
-.wrapper
-	min-height 100%
-	width 100%
-	position relative
-	overflow auto
-
 body, html
 	height 100%
 
-#footer
-	position absolute
+.navBl
+	color white
+	font-family: exo;
+	font-size 30px
+	i
+		font-size 28px
+	.head
+		float:left
+	.tail
+		float:right	
+
+.headerIcon
+	margin-left 15px
+
+.headerLink, .headerLink:focus, .headerLink:active
+	color white
+
+.headerLink:hover
+	color #ddd
+	trans(0.2s)
 
 #header
-	position absolute
+	height 50px
+	width 100%
+	background-color #333
+	border-bottom 4px solid #1A65D6
+	padding 4px 10px 4px 10px
 
-#content, #landscape, #portrait
+#content
+	height calc(100% - 50px)
+	width: 100%
+
+#landscape, #portrait
 	height 100%
 	width: 100%
-	position absolute
 
 .centerbox
 	@extends .alCenter
 	@extends .yAlign
+	@extends .center
+	width 75%
 
 #accessText
-	font-size 3vw
+	font-size 32px
 	font-family exo
 	color: #222
+
+#playerText
+	margin-bottom 30px
+	@extends #accessText
+
+.playerSelect {
+	margin-left auto
+	margin-right auto
+	width: 480px
+    height: 150px
+}
+
+.btnPlayer
+	padding-left 5px
+	padding-right 5px
+	float: left;
+	.btn
+		width 150px
+		height 150px
+		border-radius 15px
+		font-family exo
+		font-size 28px
+		border-color #505050
+	.btn:hover
+		trans(0.2s)
+		background-color #EE
 
 .turnDevice
 	width 100%

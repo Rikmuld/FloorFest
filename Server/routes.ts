@@ -36,6 +36,7 @@ var O_FRAME_RESPONS = "frame_respons"
 var O_MUSIC_START = "music_start"
 var I_MUSIC_SET = "music_set"
 var I_PLAYER_SET = "player_set"
+var O_PLAYER_SET_CLIENT = "player_set_client"
 var I_READ_FILE = "file_read"
 var O_READ_FILE = "file_read_get"
 
@@ -48,7 +49,10 @@ io.on('connection', function (socket) {
         if (socket.id == controlerId) controlerId = null;
     })
     socket.on(I_ACCESS_REQUEST, function () {
-        if (socket.id == controlerId) socket.emit(O_ACCESS_RESPONSE, true)
+        if (socket.id == controlerId) {
+            socket.emit(O_ACCESS_RESPONSE, true)
+            socket.emit(O_PLAYER_SET_CLIENT, players);
+        }
         else socket.emit(O_ACCESS_RESPONSE, false)
     })
     socket.on(I_FRAME_REQUEST, function (name: string) {
@@ -69,6 +73,7 @@ io.on('connection', function (socket) {
     })
     socket.on(I_PLAYER_SET, function (num: number) {
         players = num;
+        socket.emit(O_PLAYER_SET_CLIENT, players);
     })
     socket.on(I_READ_FILE, function (name: string) {
         fs.readFile(path.join(__dirname, 'public') + "/" + name, "utf8", function (err, data) {
@@ -93,19 +98,19 @@ function musicStart(socket) {
 
 function playerFrame(socket) {
     app.render('player', function (err, player) {
-        socket.emit(O_FRAME_RESPONS, 'players', player);
+        socket.emit(O_FRAME_RESPONS, FRAME_PLAYER, player);
     })
 }
 
 function musicListFrame(socket) {
     app.render('musicList', { players: players }, function (err, music) {
-        socket.emit(O_FRAME_RESPONS, 'musicList', music);
+        socket.emit(O_FRAME_RESPONS, FRAME_SELECT, music);
     })
 }
 
 function musicPlayingFrame(socket) {
     app.render('music', { music: currMusic }, function (err, music) {
-        socket.emit(O_FRAME_RESPONS, 'music', music);
+        socket.emit(O_FRAME_RESPONS, FRAME_MUSIC, music);
     })
 }
 

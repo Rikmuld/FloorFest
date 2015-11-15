@@ -21,3 +21,11 @@ block append contents
     #portrait.hiIntro
         .centerbox
             +turn('margin-top:-10px')
+
+block append header
+    .navBl
+        .head
+            p#logo FloorFest
+        a(href="javascript:openSettings()").tail.headerLink
+            span.playerDisp 0
+            i.headerIcon.fa.fa-users
