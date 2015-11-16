@@ -186,8 +186,8 @@ var FFInterface;
         DummyFF.setColor(Play.colors.apply(color), zone);
         DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
         //pi
-        setPin(zone * 3 + color, true);
-        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, true);
+        setPin(zone * 3 + color, 255);
+        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 255);
     }
     FFInterface.powerZone = powerZone;
     function releaseZone(zone, color) {
@@ -195,8 +195,8 @@ var FFInterface;
         DummyFF.setColor(null, zone);
         DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
         //pi
-        setPin(zone * 3 + color, false);
-        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, false);
+        setPin(zone * 3 + color, 0);
+        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 0);
     }
     FFInterface.releaseZone = releaseZone;
 })(FFInterface || (FFInterface = {}));

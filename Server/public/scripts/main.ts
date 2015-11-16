@@ -214,8 +214,8 @@ module FFInterface {
         DummyFF.setColor(Play.colors.apply(color), zone);
         DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
         //pi
-        setPin(zone * 3 + color, true);
-        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, true);
+        setPin(zone * 3 + color, 255);
+        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 255);
     }
 
     export function releaseZone(zone: number, color:number) {
@@ -223,8 +223,8 @@ module FFInterface {
         DummyFF.setColor(null, zone);
         DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
         //pi
-        setPin(zone * 3 + color, false);
-        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, false);
+        setPin(zone * 3 + color, 0);
+        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 0);
     }
 }
 
@@ -310,7 +310,7 @@ socket.on(I_MUSIC_START, Play.playMusic)
 socket.on(I_READ_FILE, Play.musicFileCalback)
 socket.on(I_PLAYER_SET_CLIENT, Play.setNumOfPlayers)
 
-function setPin(pin: number, value:boolean) {
+function setPin(pin: number, value:number) {
     socket.emit(O_SET_PIN, pin, value);
 }
 

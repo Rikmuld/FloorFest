@@ -1,7 +1,8 @@
 var url = require('url');
 var server = require('./server');
 var fs = require('fs');
-var PI = require('./pi');
+var sys = require('sys');
+var exec = require('child_process').exec;
 var path = require('path');
 var app = server.app;
 var io = server.io;
@@ -9,8 +10,6 @@ var controlerId;
 var players = 0;
 var currMusic;
 var ROOM = "controller";
-for (var i = 0; i < PI.numOfPins(); i++)
-    PI.setup(i, PI.PinMode.OUT);
 app.get('/', function (req, res) {
     res.render('index');
 });
@@ -78,7 +77,7 @@ io.on('connection', function (socket) {
         players = num;
         socket.emit(O_PLAYER_SET_CLIENT, players);
     });
-    socket.on(I_SET_PIN, PI.write);
+    socket.on(I_SET_PIN, writePin);
     socket.on(I_READ_FILE, function (name) {
         fs.readFile(path.join(__dirname, 'public') + "/" + name, "utf8", function (err, data) {
             console.log(err, data);
@@ -86,6 +85,16 @@ io.on('connection', function (socket) {
         });
     });
 });
+var pins = [3, 5, 7, 11, 13, 15, 19, 21, 23, 29, 31, 33, 35, 37, 8, 10, 12, 16, 18, 22, 24, 26, 32, 36, 38, 40];
+function writePin(pin, value) {
+    exec("pigs p " + pin + " " + value, function (error, stdout, stderr) {
+        sys.print('stdout: ' + stdout);
+        sys.print('stderr: ' + stderr);
+        if (error != null) {
+            console.log('exec error: ' + error);
+        }
+    });
+}
 function setupClient(socket) {
     if (players == 0)
         playerFrame(socket);
