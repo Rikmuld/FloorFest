@@ -85,9 +85,9 @@ io.on('connection', function (socket) {
         });
     });
 });
-var pins = [3, 5, 7, 11, 13, 15, 19, 21, 23, 29, 31, 33, 35, 37, 8, 10, 12, 16, 18, 22, 24, 26, 32, 36, 38, 40];
 function writePin(pin, value) {
-    exec("pigs p " + pin + " " + value, function (error, stdout, stderr) {
+    console.log("Calling com: " + "pigs p " + (pin + 2) + " " + value);
+    exec("pigs p " + (pin + 2) + " " + value, function (error, stdout, stderr) {
         sys.print('stdout: ' + stdout);
         sys.print('stderr: ' + stderr);
         if (error != null) {
