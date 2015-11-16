@@ -1,0 +1,249 @@
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
+.center,
+.centerbox,
+.loadbar,
+.load,
+.progress {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+.alCenter,
+.centerbox {
+  text-align: center;
+}
+.alLeft {
+  text-align: left;
+}
+.alRight {
+  text-align: right;
+}
+.yAlign,
+#musicList,
+.centerbox {
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  top: 50%;
+  position: relative;
+  display: block;
+}
+@font-face {
+  font-family: exo;
+  src: url("exo.extra-light.otf") format("opentype");
+}
+a,
+a:hover,
+a:active,
+a:focus {
+  text-decoration: none;
+}
+body,
+html {
+  height: 100%;
+}
+::-webkit-scrollbar,
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track-piece,
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-corner,
+::-webkit-resizer,
+.navBl {
+  color: #fff;
+  font-family: exo;
+  font-size: 30px;
+}
+::-webkit-scrollbar i,
+::-webkit-scrollbar-button i,
+::-webkit-scrollbar-track i,
+::-webkit-scrollbar-track-piece i,
+::-webkit-scrollbar-thumb i,
+::-webkit-scrollbar-corner i,
+::-webkit-resizer i,
+.navBl i {
+  font-size: 28px;
+}
+::-webkit-scrollbar .head,
+::-webkit-scrollbar-button .head,
+::-webkit-scrollbar-track .head,
+::-webkit-scrollbar-track-piece .head,
+::-webkit-scrollbar-thumb .head,
+::-webkit-scrollbar-corner .head,
+::-webkit-resizer .head,
+.navBl .head {
+  float: left;
+}
+::-webkit-scrollbar .tail,
+::-webkit-scrollbar-button .tail,
+::-webkit-scrollbar-track .tail,
+::-webkit-scrollbar-track-piece .tail,
+::-webkit-scrollbar-thumb .tail,
+::-webkit-scrollbar-corner .tail,
+::-webkit-resizer .tail,
+.navBl .tail {
+  float: right;
+}
+.musicBox {
+  width: 200px;
+  white-space: normal;
+}
+.coverbox {
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+.exo {
+  font-family: exo;
+}
+.musicCover {
+  width: 300px;
+  height: 300px;
+  border-radius: 10px;
+}
+.musicDisplay {
+  width: 100%;
+}
+.musicDisplay td {
+  width: 50%;
+}
+.musicContainer {
+  padding: 10px 10px 0px 10px;
+  float: left;
+}
+#musicWrapper {
+  width: 1340px;
+}
+#musicList {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+.headerIcon {
+  margin-left: 15px;
+}
+.headerLink,
+.headerLink:focus,
+.headerLink:active {
+  color: #fff;
+}
+.headerLink:hover {
+  color: #ddd;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+}
+#header {
+  height: 50px;
+  width: 100%;
+  background-color: #333;
+  border-bottom: 4px solid #1a65d6;
+  padding: 4px 10px 4px 10px;
+}
+#content {
+  height: calc(100% - 50px);
+  width: 100%;
+}
+#landscape,
+#portrait {
+  height: 100%;
+  width: 100%;
+}
+.centerbox {
+  width: 75%;
+}
+#accessText,
+#playerText {
+  font-size: 32px;
+  font-family: exo;
+  color: #222;
+}
+#playerText {
+  margin-bottom: 30px;
+}
+.playerSelect {
+  margin-left: auto;
+  margin-right: auto;
+  width: 480px;
+  height: 150px;
+}
+.btnPlayer {
+  padding-left: 5px;
+  padding-right: 5px;
+  float: left;
+}
+.btnPlayer .btn {
+  width: 150px;
+  height: 150px;
+  border-radius: 15px;
+  font-family: exo;
+  font-size: 28px;
+  border-color: #505050;
+}
+.btnPlayer .btn:hover {
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+  background-color: #eee;
+}
+.turnDevice {
+  width: 100%;
+  height: 100%;
+}
+.turnDevice p {
+  font-size: 3vw;
+  font-family: exo;
+  color: #222;
+  margin-top: 20px;
+}
+@media only screen and (orientation: portrait) {
+  .turnDevice p {
+    font-size: 5vw;
+  }
+}
+@media only screen and (orientation: landscape) {
+  .turnDevice p {
+    font-size: 3vw;
+  }
+}
+.turnDevice img {
+  width: 450px;
+}
+.loadbar,
+.load,
+.progress {
+  height: 10px;
+  border-radius: 5px;
+}
+.load {
+  width: 60vw;
+  margin-top: 20px;
+  background-color: rgba(0,0,0,0.1);
+}
+.progress {
+  width: 0vw;
+  margin-top: -10px;
+  background-color: rgba(127,127,127,0.2);
+}
+@media only screen and (orientation: portrait) {
+  #landscape {
+    display: none;
+  }
+  #portrait {
+    display: block;
+  }
+}
+@media only screen and (orientation: landscape) {
+  #portrait {
+    display: none;
+  }
+  #landscape {
+    display: block;
+  }
+}

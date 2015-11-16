@@ -18,6 +18,5 @@ exports.app = app
 exports.io = io
 
 require('./routes')
-require('./routes')
 
 server.listen(3000)

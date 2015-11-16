@@ -1,6 +1,17 @@
 ﻿var url = require('url')
 var server = require('./server')
 var fs = require('fs');
+var PI: {
+    setup(pin: number, mode: PinMode): void;
+    write(pin: number, value: boolean): void;
+    read(pin: number, callback: (err, value) => void): void;
+    numOfPins(): number;
+    PinMode: {
+        OUT: PinMode;
+        IN: PinMode;
+    };
+} = require('./pi');
+
 import path = require('path')
 
 var app = server.app
@@ -11,6 +22,8 @@ var players: number = 0;
 var currMusic: string;
 
 var ROOM = "controller";
+
+for (var i = 0; i < PI.numOfPins(); i++) PI.setup(i, PI.PinMode.OUT);
 
 app.get('/', function (req, res) {
     res.render('index')
@@ -39,6 +52,7 @@ var I_PLAYER_SET = "player_set"
 var O_PLAYER_SET_CLIENT = "player_set_client"
 var I_READ_FILE = "file_read"
 var O_READ_FILE = "file_read_get"
+var I_SET_PIN = "set_pin"
 
 io.on('connection', function (socket) {
     socket.join(ROOM);
@@ -75,6 +89,7 @@ io.on('connection', function (socket) {
         players = num;
         socket.emit(O_PLAYER_SET_CLIENT, players);
     })
+    socket.on(I_SET_PIN, PI.write);
     socket.on(I_READ_FILE, function (name: string) {
         fs.readFile(path.join(__dirname, 'public') + "/" + name, "utf8", function (err, data) {
             console.log(err, data)
@@ -104,6 +119,7 @@ function playerFrame(socket) {
 
 function musicListFrame(socket) {
     app.render('musicList', { players: players }, function (err, music) {
+        console.log(err)
         socket.emit(O_FRAME_RESPONS, FRAME_SELECT, music);
     })
 }

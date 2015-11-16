@@ -11,7 +11,7 @@ module Play {
 
     export var ZONES = 10;
 
-    var colors = new List<Vec3>(RED, GREEN, BLUE);
+    export var colors = new List<Vec3>(RED, GREEN, BLUE);
     var currentSong: Queue<MusicEvent>;
     var currentMusic: AudioObj;
 
@@ -39,10 +39,8 @@ module Play {
     }
 
     export function musicFileCalback(music: string) {
-        console.log(numOfPlayers)
         currentSong = loadSong(music, numOfPlayers);
         currentMusic.play();
-        console.log(currentSong)
         run(null);
     }
 
@@ -60,12 +58,11 @@ module Play {
     }
 
     function run(event: MusicEvent) {
-        console.log(event)
         if (currentMusic == null) return;
 
         if (event != null) {
             FFInterface.powerZone(event.color, event.zone)
-            setTimeout(function () { FFInterface.releaseZone(event.zone) }, noteSpeed*100)
+            setTimeout(function () { FFInterface.releaseZone(event.zone, event.color) }, noteSpeed*100)
         }
 
         if (currentMusic.audio.ended) {
@@ -148,12 +145,12 @@ module Play {
     class MusicEvent {
         time: number;
         zone: number;
-        color: Colour;
+        color: number;
 
         constructor(time: number, zone: number, player: number) {
             this.time = time;
             this.zone = zone;
-            this.color = getColor(player);
+            this.color = player;
         }
     }
 
@@ -175,7 +172,7 @@ module DummyFF {
     var STRIP_COUNT = Play.ZONES;
 
     export function createDummy() {
-        QuickGL.initGL(setup, loop, window.innerWidth - 325, 75, 300, 300, [0, 0, 0, 1]);
+        //QuickGL.initGL(setup, loop, window.innerWidth - 325, 75, 300, 300, [0, 0, 0, 1]);
     }
 
     function setup() {
@@ -199,7 +196,6 @@ module DummyFF {
         GLF.clearBufferColor();
         for (var i = 0; i < lines.size(); i++) {
             var nwColor = color[i];
-            console.log(nwColor)
             if (nwColor == null) nwColor = [1, 1, 1];
             render.setColorV3(nwColor);
             render.line(lines.apply(i));
@@ -208,20 +204,27 @@ module DummyFF {
 }
 
 /*
- * Connects the program to light output, is for now connected to the DummyFF.
+ * Connects the program to light output.
  */
 module FFInterface {
     var NUM_ZONES = Play.ZONES;
 
-    export function powerZone(color: Vec3, zone: number) {
-        console.log(color, zone)
-        DummyFF.setColor(color, zone);
-        DummyFF.setColor(color, MMath.mod(zone + 1, NUM_ZONES));
+    export function powerZone(color: number, zone: number) {
+        //dummy (disable when on pi)
+        DummyFF.setColor(Play.colors.apply(color), zone);
+        DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
+        //pi
+        setPin(zone * 3 + color, true);
+        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, true);
     }
 
-    export function releaseZone(zone: number) {
+    export function releaseZone(zone: number, color:number) {
+        //dummy (disable when on pi)
         DummyFF.setColor(null, zone);
         DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
+        //pi
+        setPin(zone * 3 + color, false);
+        setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, false);
     }
 }
 
@@ -231,6 +234,7 @@ module FFInterface {
 
 var audio: AudioManager;
 var TEST_SONG = new List("testMusic", "../music/testMusic.mp3");
+var FROZEN = new List("frozen", "../music/frozen.mp3");
 
 $(document).ready(init);
 
@@ -241,6 +245,7 @@ function init() {
 
     audio = new AudioManager();
     audio.loadAudio(TEST_SONG.apply(0), TEST_SONG.apply(1));
+    audio.loadAudio(FROZEN.apply(0), FROZEN.apply(1));
 }
 
 /*
@@ -293,6 +298,7 @@ var I_PLAYER_SET_CLIENT = "player_set_client"
 var O_PLAYER_SET = "player_set"
 var O_READ_FILE = "file_read"
 var I_READ_FILE = "file_read_get"
+var O_SET_PIN = "set_pin"
 
 var socket = io();
 var currentFrame: string;
@@ -303,6 +309,10 @@ socket.on(I_FRAME_RESPONS, responseFrame)
 socket.on(I_MUSIC_START, Play.playMusic)
 socket.on(I_READ_FILE, Play.musicFileCalback)
 socket.on(I_PLAYER_SET_CLIENT, Play.setNumOfPlayers)
+
+function setPin(pin: number, value:boolean) {
+    socket.emit(O_SET_PIN, pin, value);
+}
 
 function loadMusicFile(name: string) {
     socket.emit(O_READ_FILE, name)
@@ -322,6 +332,10 @@ function requestFrame(name: string) {
 
 function responseFrame(id:string, frame) {
     setHtml(FRAME, frame);
+    console.log(id)
+    if (id == FRAME_MUSIC) {
+        css(MUSIC_COVER, "background-image", "Url(image/" + attr(MUSIC_COVER, 'song') + ".jpg)")
+    }
     currentFrame = id;
 }
 
@@ -363,6 +377,7 @@ var INTRO_SHOW = ".diIntro";
 var INTRO_HIDE = ".hiIntro";
 var FRAME = "#landscape";
 var PLAYER_DISP = ".playerDisp";
+var MUSIC_COVER = ".coverbox"
 
 function setText(id: string, text: string) {
     $(id).text(text);
@@ -390,4 +405,8 @@ function css(id: string, prop, value: string) {
 
 function setHtml(id: string, data) {
     $(id).html(data);
+}
+
+function attr(id: string, attr: string):string {
+    return $(id).attr(attr);
 }
