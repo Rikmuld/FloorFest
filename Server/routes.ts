@@ -11,9 +11,55 @@ var io = server.io
 
 var controlerId: string;
 var players: number = 0;
-var currMusic: string;
 
 var ROOM = "controller";
+
+/*
+ *  Music
+ */
+
+var music:Song[] = [];
+
+class Song {
+    private name: string;
+    private img: string;
+    private longImage: string;
+    private author: string;
+    private id: string;
+
+    constructor(id: string, name: string, author: string, cover: string, banner?: string) {
+        this.name = name;
+        this.img = cover;
+        this.author = author;
+        this.id = id;
+        if (banner) this.longImage = banner;
+        else this.longImage = cover.split('.')[0] + "-long.png";
+
+        music.push(this);
+    }
+
+    getId(): string { return this.id }
+    getLongImg(): string { return this.longImage }
+
+    static find(id: string): Song {
+        return music.filter((song:Song, index:number, array:Song[]): boolean => {
+            return song.getId() == id;
+        })[0];
+    }
+}
+
+var CANON_IN_D = new Song("canon", "Canon in D", "Johann Pachelbel", "canon.jpg");
+var LET_IT_GO = new Song("frozen", "Let it Go", "Idina Menzel", "frozen.jpg");
+var LORT_RINGS = new Song("hobbit", "Concerning Hobbits", "Howard Shore", "hobbit.jpg", "hobbit-long.jpg");
+var HELLO = new Song("hello", "Hello", "Adele", "adele.jpg", "adele-long.jpg");
+var PIRATE = new Song("pirate", "He is a Pirate", "Klaus Badelt", "pirate.jpg", "pirate-long.jpg");
+var JURESIC = new Song("juresic", "Jurassic Park: Main Theme", "John Williams", "park.jpg", "park-long.jpg");
+
+var currMusic: Song;
+
+/*
+ * Routes
+ */ 
 
 app.get('/', function (req, res) {
     res.render('index')
@@ -72,7 +118,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on(I_MUSIC_SET, function (name: string) {
-        currMusic = name;
+        currMusic = Song.find(name);
         if (currMusic != null) musicStart(socket);
     })
     socket.on(I_PLAYER_SET, function (num: number) {
@@ -108,7 +154,7 @@ function setupClient(socket) {
 }
 
 function musicStart(socket) {
-    socket.emit(O_MUSIC_START, currMusic);
+    socket.emit(O_MUSIC_START, currMusic.getId());
 }
 
 function playerFrame(socket) {
@@ -118,15 +164,15 @@ function playerFrame(socket) {
 }
 
 function musicListFrame(socket) {
-    app.render('musicList', { players: players }, function (err, music) {
+    app.render('musicList', { players: players, music:music }, function (err, music) {
         console.log(err)
         socket.emit(O_FRAME_RESPONS, FRAME_SELECT, music);
     })
 }
 
 function musicPlayingFrame(socket) {
-    app.render('music', { music: currMusic }, function (err, music) {
-        socket.emit(O_FRAME_RESPONS, FRAME_MUSIC, music);
+    app.render('music', function (err, music) {
+        socket.emit(O_FRAME_RESPONS, FRAME_MUSIC, music, currMusic.getId(), currMusic.getLongImg());
     })
 }
 

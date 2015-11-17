@@ -90,7 +90,12 @@ html {
 }
 .musicBox {
   width: 200px;
+  height: 380px;
   white-space: normal;
+}
+.musicBox img {
+  width: 190px;
+  height: 190px;
 }
 .coverbox {
   background-repeat: no-repeat;

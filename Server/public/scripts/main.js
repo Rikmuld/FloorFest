@@ -39,6 +39,7 @@ var Play;
     Play.musicFileCalback = musicFileCalback;
     function keyDown(event) {
         if (event.keyCode == Keyboard.KEY_SPACE) {
+            console.log(Math.floor(currentMusic.time() * 10));
         }
     }
     function kill() {
@@ -155,7 +156,7 @@ var DummyFF;
     var shader;
     var STRIP_COUNT = Play.ZONES;
     function createDummy() {
-        //QuickGL.initGL(setup, loop, window.innerWidth - 325, 75, 300, 300, [0, 0, 0, 1]);
+        QuickGL.initGL(setup, loop, window.innerWidth - 125, 99, 100, 100, [0, 0, 0, 1]);
     }
     DummyFF.createDummy = createDummy;
     function setup() {
@@ -211,16 +212,31 @@ var FFInterface;
  * Initiation
  */
 var audio;
-var TEST_SONG = new List("testMusic", "../music/testMusic.mp3");
-var FROZEN = new List("frozen", "../music/frozen.mp3");
-var SONGS = { "testMusic": "Canon in D", "frozen": "Let it go" };
+var music = {};
+var Song = (function () {
+    function Song(id, name) {
+        this.name = name;
+        this.audio = "../music/" + id + ".mp3";
+        music[id] = this;
+    }
+    return Song;
+})();
+var CANON_IN_D = new Song("canon", "Canon in D");
+var LET_IT_GO = new Song("frozen", "Let it Go");
+var LORT_RINGS = new Song("hobbit", "Concerning Hobbits");
+var HELLO = new Song("hello", "Hello");
+var PIRATE = new Song("pirate", "He is a Pirate");
+var JURESIC = new Song("juresic", "Jurassic Park: Main Theme");
 $(document).ready(init);
 function init() {
     startIntro();
     requestAccess();
     audio = new AudioManager();
-    audio.loadAudio(TEST_SONG.apply(0), TEST_SONG.apply(1));
-    audio.loadAudio(FROZEN.apply(0), FROZEN.apply(1));
+    for (var song in music) {
+        if (music.hasOwnProperty(song)) {
+            audio.loadAudio(song, music[song].audio);
+        }
+    }
 }
 /*
  * Intro animation
@@ -288,12 +304,11 @@ function responseAccess(hasAccess) {
 function requestFrame(name) {
     socket.emit(O_FRAME_REQUEST, name);
 }
-function responseFrame(id, frame) {
+function responseFrame(id, frame, song, img) {
     setHtml(FRAME, frame);
     if (id == FRAME_MUSIC) {
-        var music = attr(MUSIC_COVER, 'song');
-        css(MUSIC_COVER, "background-image", "Url(image/" + music + "-long.png)");
-        setHeaderText("Now playing: " + SONGS[music]);
+        css(MUSIC_COVER, "background-image", "Url(image/" + img + ")");
+        setHeaderText("Now playing: " + music[song].name);
         setHeaderIcon(ICON_CENCEL);
     }
     else {
@@ -343,7 +358,6 @@ var HEADER_TEXT = "#logo";
 var MUSIC_PROG = "#musicProg-bar";
 function setMusicProg(current, total) {
     var value = ((current / total) * 100).toString() + "%";
-    console.log(value);
     css(MUSIC_PROG, "width", value);
 }
 function setHeaderText(text) {

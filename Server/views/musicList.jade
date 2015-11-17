@@ -1,13 +1,13 @@
-﻿mixin music(name, id, text)
+﻿mixin music(name, id, author, img)
     .musicContainer
         .thumbnail.musicBox
-            img(src="/image/" + id + ".jpg" alt=name)
+            img(src="/image/" + img alt=name)
             .caption.alCenter
                 h3= name
-                p= text
+                p= author
                 button.btn.btn-default.btn-play(type="button" onclick="javascript:playMusic('" + id + "')") Play Now!
 
 .container-fluid#musicList
     #musicWrapper
-        +music("Let It Go", "frozen", "Idina Menzel")
-        +music("Canon in D", "testMusic", "Johann Pachelbel")
+        each song in music
+            +music(song.name, song.id, song.author, song.img)
