@@ -14,9 +14,9 @@ var Play;
     var currTime;
     var song;
     var score;
-    var numOfPlayers;
+    Play.numOfPlayers;
     function setNumOfPlayers(players) {
-        numOfPlayers = players;
+        Play.numOfPlayers = players;
         setText(PLAYER_DISP, players.toString());
     }
     Play.setNumOfPlayers = setNumOfPlayers;
@@ -27,13 +27,14 @@ var Play;
         Keyboard.listenForKeysCustom(keyDown, null);
         currTime = 0;
         currentMusic = audio.getAudio(name);
-        loadMusicFile("music/" + name + ".ff");
+        setTimeout(function () { loadMusicFile("music/" + name + ".ff"); }, 2000);
     }
     Play.playMusic = playMusic;
     function musicFileCalback(music) {
-        currentSong = loadSong(music, numOfPlayers);
+        currentSong = loadSong(music, Play.numOfPlayers);
         currentMusic.play();
         run(null);
+        updateMusicProg();
     }
     Play.musicFileCalback = musicFileCalback;
     function keyDown(event) {
@@ -47,6 +48,12 @@ var Play;
         document.body.removeChild(document.body.lastChild);
     }
     Play.kill = kill;
+    function updateMusicProg() {
+        if (currentMusic == null || currentMusic.audio.ended)
+            return;
+        setMusicProg(currentMusic.time(), currentMusic.audio.duration);
+        setTimeout(updateMusicProg, 20);
+    }
     function run(event) {
         if (currentMusic == null)
             return;
@@ -206,6 +213,7 @@ var FFInterface;
 var audio;
 var TEST_SONG = new List("testMusic", "../music/testMusic.mp3");
 var FROZEN = new List("frozen", "../music/frozen.mp3");
+var SONGS = { "testMusic": "Canon in D", "frozen": "Let it go" };
 $(document).ready(init);
 function init() {
     startIntro();
@@ -220,7 +228,9 @@ function init() {
 function startIntro() {
     css(INTRO_SHOW, "display", "block");
     css(INTRO_HIDE, "display", "none");
-    animate(LOAD_PROGRESS, { width: '60vw' }, 3000, endIntro);
+    setTimeout(function () {
+        animate(LOAD_PROGRESS, { width: '60vw' }, 1500, endIntro);
+    }, 200);
 }
 function endIntro() {
     animate(LOAD_BAR, { width: '0vw' }, 500, start);
@@ -280,9 +290,15 @@ function requestFrame(name) {
 }
 function responseFrame(id, frame) {
     setHtml(FRAME, frame);
-    console.log(id);
     if (id == FRAME_MUSIC) {
-        css(MUSIC_COVER, "background-image", "Url(image/" + attr(MUSIC_COVER, 'song') + ".jpg)");
+        var music = attr(MUSIC_COVER, 'song');
+        css(MUSIC_COVER, "background-image", "Url(image/" + music + "-long.png)");
+        setHeaderText("Now playing: " + SONGS[music]);
+        setHeaderIcon(ICON_CENCEL);
+    }
+    else {
+        setHeaderText("FloorFest");
+        setHeaderIcon(ICON_USERS);
     }
     currentFrame = id;
 }
@@ -292,6 +308,8 @@ function responseFrame(id, frame) {
 function openSettings() {
     if (access && currentFrame == FRAME_SELECT)
         requestFrame(FRAME_PLAYER);
+    else if (currentFrame == FRAME_MUSIC)
+        cencelMusic();
 }
 function setNumOfPlayers(players) {
     socket.emit(O_PLAYER_SET, players);
@@ -307,7 +325,7 @@ function cencelMusic() {
     Play.kill();
 }
 /*
- * JQuerry, document constants and helper methods
+ * JQuerry, constants and helper methods
  */
 var ACCESS_MESSAGE = "#accessText";
 var INTRO = "#intro";
@@ -320,6 +338,28 @@ var INTRO_HIDE = ".hiIntro";
 var FRAME = "#landscape";
 var PLAYER_DISP = ".playerDisp";
 var MUSIC_COVER = ".coverbox";
+var HEADER_ICON = "#headerIcon";
+var HEADER_TEXT = "#logo";
+var MUSIC_PROG = "#musicProg-bar";
+function setMusicProg(current, total) {
+    var value = ((current / total) * 100).toString() + "%";
+    console.log(value);
+    css(MUSIC_PROG, "width", value);
+}
+function setHeaderText(text) {
+    setText(HEADER_TEXT, text);
+}
+var ICON_USERS = "users";
+var ICON_CENCEL = "ban";
+function setHeaderIcon(icon) {
+    remClass(HEADER_ICON, "fa-" + ICON_USERS);
+    remClass(HEADER_ICON, "fa-" + ICON_CENCEL);
+    addClass(HEADER_ICON, "fa-" + icon);
+    if (icon == ICON_USERS)
+        setText(PLAYER_DISP, Play.numOfPlayers.toString());
+    else
+        setText(PLAYER_DISP, "");
+}
 function setText(id, text) {
     $(id).text(text);
 }
@@ -343,5 +383,11 @@ function setHtml(id, data) {
 }
 function attr(id, attr) {
     return $(id).attr(attr);
+}
+function remClass(id, clas) {
+    $(id).removeClass(clas);
+}
+function addClass(id, clas) {
+    $(id).addClass(clas);
 }
 //# sourceMappingURL=main.js.map

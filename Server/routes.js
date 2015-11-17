@@ -88,8 +88,6 @@ io.on('connection', function (socket) {
 var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 25, 24, 23, 18, 15, 14];
 function writePin(pin, value) {
     exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
-        sys.print('stdout: ' + stdout);
-        sys.print('stderr: ' + stderr);
         if (error != null) {
             console.log('exec error: ' + error);
         }

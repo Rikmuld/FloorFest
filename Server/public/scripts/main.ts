@@ -19,7 +19,7 @@ module Play {
     var currTime: number;
     var song: string;
     var score: number;
-    var numOfPlayers: number;
+    export var numOfPlayers: number;
 
     export function setNumOfPlayers(players: number) {
         numOfPlayers = players;
@@ -35,13 +35,14 @@ module Play {
         currTime = 0;
         currentMusic = audio.getAudio(name);
 
-        loadMusicFile("music/" + name + ".ff");
+        setTimeout(function () { loadMusicFile("music/" + name + ".ff") }, 2000);
     }
 
     export function musicFileCalback(music: string) {
         currentSong = loadSong(music, numOfPlayers);
         currentMusic.play();
         run(null);
+        updateMusicProg();
     }
 
     function keyDown(event) {
@@ -55,6 +56,12 @@ module Play {
         currentMusic.time(0);
         currentMusic = null;
         document.body.removeChild(document.body.lastChild);
+    }
+
+    function updateMusicProg() {
+        if (currentMusic == null || currentMusic.audio.ended) return;
+        setMusicProg(currentMusic.time(), currentMusic.audio.duration);
+        setTimeout(updateMusicProg, 20);
     }
 
     function run(event: MusicEvent) {
@@ -235,6 +242,7 @@ module FFInterface {
 var audio: AudioManager;
 var TEST_SONG = new List("testMusic", "../music/testMusic.mp3");
 var FROZEN = new List("frozen", "../music/frozen.mp3");
+var SONGS = {"testMusic":"Canon in D", "frozen":"Let it go"}
 
 $(document).ready(init);
 
@@ -255,7 +263,9 @@ function init() {
 function startIntro() {
     css(INTRO_SHOW, "display", "block");
     css(INTRO_HIDE, "display", "none");
-    animate(LOAD_PROGRESS, { width: '60vw' }, 3000, endIntro);
+    setTimeout(function () {
+        animate(LOAD_PROGRESS, { width: '60vw' }, 1500, endIntro);
+    }, 200)
 }
 
 function endIntro() {
@@ -332,9 +342,14 @@ function requestFrame(name: string) {
 
 function responseFrame(id:string, frame) {
     setHtml(FRAME, frame);
-    console.log(id)
     if (id == FRAME_MUSIC) {
-        css(MUSIC_COVER, "background-image", "Url(image/" + attr(MUSIC_COVER, 'song') + ".jpg)")
+        var music = attr(MUSIC_COVER, 'song');
+        css(MUSIC_COVER, "background-image", "Url(image/" + music + "-long.png)")
+        setHeaderText("Now playing: " + SONGS[music]);
+        setHeaderIcon(ICON_CENCEL);
+    } else {
+        setHeaderText("FloorFest");
+        setHeaderIcon(ICON_USERS);
     }
     currentFrame = id;
 }
@@ -345,6 +360,7 @@ function responseFrame(id:string, frame) {
 
 function openSettings() {
     if (access && currentFrame == FRAME_SELECT) requestFrame(FRAME_PLAYER);
+    else if (currentFrame == FRAME_MUSIC) cencelMusic();
 }
 
 function setNumOfPlayers(players: number) {
@@ -364,7 +380,7 @@ function cencelMusic() {
 }
 
 /*
- * JQuerry, document constants and helper methods
+ * JQuerry, constants and helper methods
  */
 
 var ACCESS_MESSAGE = "#accessText";
@@ -378,6 +394,31 @@ var INTRO_HIDE = ".hiIntro";
 var FRAME = "#landscape";
 var PLAYER_DISP = ".playerDisp";
 var MUSIC_COVER = ".coverbox"
+var HEADER_ICON = "#headerIcon"
+var HEADER_TEXT = "#logo"
+var MUSIC_PROG = "#musicProg-bar";
+
+function setMusicProg(current: number, total: number) {
+    var value = ((current / total) * 100).toString() + "%"
+    console.log(value)
+    css(MUSIC_PROG, "width", value);
+}
+
+function setHeaderText(text: string) {
+    setText(HEADER_TEXT, text);
+}
+
+var ICON_USERS = "users";
+var ICON_CENCEL = "ban";
+
+function setHeaderIcon(icon: string) {
+    remClass(HEADER_ICON, "fa-" + ICON_USERS);
+    remClass(HEADER_ICON, "fa-" + ICON_CENCEL);
+    addClass(HEADER_ICON, "fa-" + icon);
+
+    if (icon == ICON_USERS) setText(PLAYER_DISP, Play.numOfPlayers.toString())
+    else setText(PLAYER_DISP, "")
+}
 
 function setText(id: string, text: string) {
     $(id).text(text);
@@ -409,4 +450,12 @@ function setHtml(id: string, data) {
 
 function attr(id: string, attr: string):string {
     return $(id).attr(attr);
+}
+
+function remClass(id: string, clas: string) {
+    $(id).removeClass(clas);
+}
+
+function addClass(id: string, clas: string) {
+    $(id).addClass(clas);
 }

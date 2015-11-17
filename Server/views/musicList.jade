@@ -2,16 +2,12 @@
     .musicContainer
         .thumbnail.musicBox
             img(src="/image/" + id + ".jpg" alt=name)
-            .caption
+            .caption.alCenter
                 h3= name
                 p= text
-                button.btn.btn-default(type="button" onclick="javascript:playMusic('" + id + "')") Play Now!
+                button.btn.btn-default.btn-play(type="button" onclick="javascript:playMusic('" + id + "')") Play Now!
 
 .container-fluid#musicList
     #musicWrapper
-        +music("Let It Go", "frozen", "Let It Go from Disney's Frozen by Idina Menzel")
-        +music("Canon in D", "testMusic", "Canon in D by Parchbell, Test Music")
-        +music("Test Music 3", "testMusic", "lorem ipsum dolor sit amet eam sit ultra upsedus dolorem et emet!")
-        +music("Test Music 4", "testMusic", "lorem ipsum dolor sit amet eam sit ultra upsedus dolorem et emet!")
-        +music("Test Music 5", "testMusic", "lorem ipsum dolor sit amet eam sit ultra upsedus dolorem et emet!")
-        +music("Test Music 6", "testMusic", "lorem ipsum dolor sit amet eam sit ultra upsedus dolorem et emet!")
+        +music("Let It Go", "frozen", "Idina Menzel")
+        +music("Canon in D", "testMusic", "Johann Pachelbel")
