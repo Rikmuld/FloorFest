@@ -432,7 +432,7 @@ class AudioManager {
         var container = document.createElement("audio");
         var source = document.createElement("source");
         container.setAttribute('id', key);
-        source.setAttribute('type', "audio/ogg");
+        source.setAttribute('type', "audio/mp3");
         source.setAttribute('src', audioName);
         container.appendChild(source);
         document.body.appendChild(container);

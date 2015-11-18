@@ -54,21 +54,23 @@ var LORT_RINGS = new Song("hobbit", "Concerning Hobbits", "Howard Shore", "hobbi
 var HELLO = new Song("hello", "Hello", "Adele", "adele.jpg", "adele-long.jpg");
 var PIRATE = new Song("pirate", "He is a Pirate", "Klaus Badelt", "pirate.jpg", "pirate-long.jpg");
 var JURESIC = new Song("juresic", "Jurassic Park: Main Theme", "John Williams", "park.jpg", "park-long.jpg");
-var ALL_I_EVER = new Song("all_I_ever", "T", "T", "T", "T");
-var COUNTDOWN = new Song("countdown", "T", "T", "T", "T");
-var FIREFLIES = new Song("fireflies", "T", "T", "T", "T");
-var HOW_DEEP_LOVE = new Song("how_deep_love", "T", "T", "T", "T");
-var LAST_GOODBYE = new Song("last_goodbye", "T", "T", "T", "T");
-var LAY_IT_ALL = new Song("lay_it_all", "T", "T", "T", "T");
-var LINDSEY = new Song("lindsey", "T", "T", "T", "T");
-var LUSH_LIFE = new Song("lush_life", "T", "T", "T", "T");
-var RUN_WILD = new Song("run_wild", "T", "T", "T", "T");
-var SORRY = new Song("sorry", "T", "T", "T", "T");
-var STICHES = new Song("stiches", "T", "T", "T", "T");
-var SWIFT = new Song("swift", "T", "T", "T", "T");
-var TIGER = new Song("tiger", "T", "T", "T", "T");
-var VILLAGE = new Song("village", "T", "T", "T", "T");
-var VIVA = new Song("viva", "T", "T", "T", "T");
+var ALL_I_EVER = new Song("all_I_ever", "All I Ever Wanted", "T", "canon.jpg");
+var COUNTDOWN = new Song("countdown", "The Final Countdown", "T", "canon.jpg");
+var FIREFLIES = new Song("fireflies", "Fireflies", "T", "canon.jpg");
+var HOW_DEEP_LOVE = new Song("how_deep_love", "How Deep is Your Love", "T", "canon.jpg");
+var LAST_GOODBYE = new Song("last_goodbye", "Last Goodbye", "T", "canon.jpg");
+var LAY_IT_ALL = new Song("lay_it_all", "Lay it All on Me", "T", "canon.jpg");
+var LINDSEY = new Song("lindsey", "Shatter Me", "T", "canon.jpg");
+var LUSH_LIFE = new Song("lush_life", "Lush Life", "T", "canon.jpg");
+var RUN_WILD = new Song("run_wild", "Who run the World", "T", "canon.jpg");
+var SORRY = new Song("sorry", "Sorry", "T", "canon.jpg");
+var STICHES = new Song("stiches", "Stiches", "T", "canon.jpg");
+var SWIFT = new Song("swift", "Blanc Space", "T", "canon.jpg");
+var TIGER = new Song("tiger", "Eye of the Tiger", "T", "canon.jpg");
+var VILLAGE = new Song("village", "Village People", "T", "canon.jpg");
+var VIVA = new Song("viva", "Viva la Vida", "T", "canon.jpg");
+var GANGAN = new Song("gangan", "Gangnam Style", "", "canon.jpg");
+
 
 var currMusic: Song;
 

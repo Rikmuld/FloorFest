@@ -19,6 +19,7 @@ module Play {
     var currTime: number;
     var song: string;
     var score: number;
+    var audio: AudioManager = new AudioManager();
     export var numOfPlayers: number;
 
     export function setNumOfPlayers(players: number) {
@@ -33,6 +34,7 @@ module Play {
         Keyboard.listenForKeysCustom(keyDown, null);
 
         currTime = 0;
+        audio.loadAudio(name, music[name].audio);
         currentMusic = audio.getAudio(name);
 
         setTimeout(function () { loadMusicFile("music/" + name + ".ff") }, 2000);
@@ -239,7 +241,6 @@ module FFInterface {
  * Initiation
  */ 
 
-var audio: AudioManager;
 var music = {};
 
 class Song {
@@ -260,21 +261,23 @@ var LORT_RINGS = new Song("hobbit", "Concerning Hobbits");
 var HELLO = new Song("hello", "Hello");
 var PIRATE = new Song("pirate", "He is a Pirate");
 var JURESIC = new Song("juresic", "Jurassic Park: Main Theme");
-var ALL_I_EVER = new Song("all_I_ever", "T")
-var COUNTDOWN = new Song("countdown", "T")
-var FIREFLIES = new Song("fireflies", "T")
-var HOW_DEEP_LOVE = new Song("how_deep_love", "T")
-var LAST_GOODBYE = new Song("last_goodbye", "T")
-var LAY_IT_ALL = new Song("lay_it_all", "T")
-var LINDSEY = new Song("lindsey", "T")
-var LUSH_LIFE = new Song("lush_life", "T")
-var RUN_WILD = new Song("run_wild", "T")
-var SORRY = new Song("sorry", "T")
-var STICHES = new Song("stiches", "T")
-var SWIFT = new Song("swift", "T")
-var TIGER = new Song("tiger", "T")
-var VILLAGE = new Song("village", "T")
-var VIVA = new Song("viva", "T");
+var ALL_I_EVER = new Song("all_I_ever", "All I Ever Wanted")
+var COUNTDOWN = new Song("countdown", "The Final Countdown")
+var FIREFLIES = new Song("fireflies", "Fireflies")
+var HOW_DEEP_LOVE = new Song("how_deep_love", "How Deep is Your Love")
+var LAST_GOODBYE = new Song("last_goodbye", "The Last Goodbye")
+var LAY_IT_ALL = new Song("lay_it_all", "Lay it All on Me")
+var LINDSEY = new Song("lindsey", "Shatter Me")
+var LUSH_LIFE = new Song("lush_life", "Lush Life")
+var RUN_WILD = new Song("run_wild", "Run Wild")
+var SORRY = new Song("sorry", "Sorry")
+var STICHES = new Song("stiches", "Stiches")
+var SWIFT = new Song("swift", "Blanck Space")
+var TIGER = new Song("tiger", "Eye of the Tiger")
+var VILLAGE = new Song("village", "Vilage People")
+var VIVA = new Song("viva", "Viva la Vida");
+var GANGAN = new Song("gangan", "Gangnam Style");
+var POMPEII = new Song("popeii", "Pompeii");
 
 $(document).ready(init);
 
@@ -282,13 +285,6 @@ function init() {
     startIntro();
 
     requestAccess()
-
-    audio = new AudioManager();
-    for (var song in music) {
-        if (music.hasOwnProperty(song)) {
-            audio.loadAudio(song, music[song].audio);
-        }
-    }
 }
 
 /*
