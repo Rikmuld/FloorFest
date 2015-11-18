@@ -40,6 +40,21 @@ var LORT_RINGS = new Song("hobbit", "Concerning Hobbits", "Howard Shore", "hobbi
 var HELLO = new Song("hello", "Hello", "Adele", "adele.jpg", "adele-long.jpg");
 var PIRATE = new Song("pirate", "He is a Pirate", "Klaus Badelt", "pirate.jpg", "pirate-long.jpg");
 var JURESIC = new Song("juresic", "Jurassic Park: Main Theme", "John Williams", "park.jpg", "park-long.jpg");
+var ALL_I_EVER = new Song("all_I_ever", "T", "T", "T", "T");
+var COUNTDOWN = new Song("countdown", "T", "T", "T", "T");
+var FIREFLIES = new Song("fireflies", "T", "T", "T", "T");
+var HOW_DEEP_LOVE = new Song("how_deep_love", "T", "T", "T", "T");
+var LAST_GOODBYE = new Song("last_goodbye", "T", "T", "T", "T");
+var LAY_IT_ALL = new Song("lay_it_all", "T", "T", "T", "T");
+var LINDSEY = new Song("lindsey", "T", "T", "T", "T");
+var LUSH_LIFE = new Song("lush_life", "T", "T", "T", "T");
+var RUN_WILD = new Song("run_wild", "T", "T", "T", "T");
+var SORRY = new Song("sorry", "T", "T", "T", "T");
+var STICHES = new Song("stiches", "T", "T", "T", "T");
+var SWIFT = new Song("swift", "T", "T", "T", "T");
+var TIGER = new Song("tiger", "T", "T", "T", "T");
+var VILLAGE = new Song("village", "T", "T", "T", "T");
+var VIVA = new Song("viva", "T", "T", "T", "T");
 var currMusic;
 /*
  * Routes
