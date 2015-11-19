@@ -27,13 +27,14 @@ class Song {
     private author: string;
     private id: string;
 
-    constructor(id: string, name: string, author: string, cover: string, banner?: string) {
+    constructor(id: string, name: string, author: string, cover?: string, banner?: string) {
         this.name = name;
-        this.img = cover;
+        if (cover) this.img = cover;
+        else this.img = id + ".jpg";
         this.author = author;
         this.id = id;
         if (banner) this.longImage = banner;
-        else this.longImage = cover.split('.')[0] + "-long.png";
+        else this.longImage = this.img.split('.')[0] + "-long.jpg";
 
         music.push(this);
     }
@@ -48,31 +49,31 @@ class Song {
     }
 }
 
-var CANON_IN_D = new Song("canon", "Canon in D", "Johann Pachelbel", "canon.jpg");
-var LET_IT_GO = new Song("frozen", "Let it Go", "Idina Menzel", "frozen.jpg");
-var LORT_RINGS = new Song("hobbit", "Concerning Hobbits", "Howard Shore", "hobbit.jpg", "hobbit-long.jpg");
-var HELLO = new Song("hello", "Hello", "Adele", "adele.jpg", "adele-long.jpg");
-var PIRATE = new Song("pirate", "He is a Pirate", "Klaus Badelt", "pirate.jpg", "pirate-long.jpg");
-var JURESIC = new Song("juresic", "Jurassic Park: Main Theme", "John Williams", "park.jpg", "park-long.jpg");
-var ALL_I_EVER = new Song("all_I_ever", "All I Ever Wanted", "T", "canon.jpg");
-var COUNTDOWN = new Song("countdown", "The Final Countdown", "T", "canon.jpg");
-var FIREFLIES = new Song("fireflies", "Fireflies", "T", "canon.jpg");
-var HOW_DEEP_LOVE = new Song("how_deep_love", "How Deep is Your Love", "T", "canon.jpg");
-var LAST_GOODBYE = new Song("last_goodbye", "Last Goodbye", "T", "canon.jpg");
-var LAY_IT_ALL = new Song("lay_it_all", "Lay it All on Me", "T", "canon.jpg");
-var LINDSEY = new Song("lindsey", "Shatter Me", "T", "canon.jpg");
-var LUSH_LIFE = new Song("lush_life", "Lush Life", "T", "canon.jpg");
-var RUN_WILD = new Song("run_wild", "Who run the World", "T", "canon.jpg");
-var SORRY = new Song("sorry", "Sorry", "T", "canon.jpg");
-var STICHES = new Song("stiches", "Stiches", "T", "canon.jpg");
-var SWIFT = new Song("swift", "Blanc Space", "T", "canon.jpg");
-var TIGER = new Song("tiger", "Eye of the Tiger", "T", "canon.jpg");
-var VILLAGE = new Song("village", "Village People", "T", "canon.jpg");
-var VIVA = new Song("viva", "Viva la Vida", "T", "canon.jpg");
-var GANGAN = new Song("gangan", "Gangnam Style", "", "canon.jpg");
-
+var CANON_IN_D = new Song("canon", "Canon in D", "Johann Pachelbel", "canon.jpg", "canon-long.png")
+var LET_IT_GO = new Song("frozen", "Let it Go", "Idina Menzel", "frozen.jpg", "frozen-long.png");
+var LORT_RINGS = new Song("hobbit", "Concerning Hobbits", "Howard Shore");
+var HELLO = new Song("hello", "Hello", "Adele", "adele.jpg");
+var PIRATE = new Song("pirate", "He is a Pirate", "Klaus Badelt");
+var JURESIC = new Song("juresic", "Jurassic Park: Main Theme", "John Williams", "park.jpg");
+var ALL_I_EVER = new Song("all_I_ever", "All I Ever Wanted", "Basshunter", "all_I_ever.jpg", "all_I_ever-long.png");
+var COUNTDOWN = new Song("countdown", "The Final Countdown", "Europe");
+var FIREFLIES = new Song("fireflies", "Fireflies", "Owl City");
+var HOW_DEEP_LOVE = new Song("how_deep_love", "How Deep is Your Love", "Callvin Harris");
+var LAST_GOODBYE = new Song("last_goodbye", "Last Goodbye", "Billy Boid");
+var LAY_IT_ALL = new Song("lay_it_all", "Lay it All on Me", "Rudimental feat. Ed Sheerman");
+var LINDSEY = new Song("lindsey", "Shatter Me", "Lindsey Stiring");
+var LUSH_LIFE = new Song("lush_life", "Lush Life", "Zara Larsson", "lush_life.jpg", "lush_life-long.png");
+var RUN_WILD = new Song("run_wild", "Who run the World", "Beyonce");
+var SORRY = new Song("sorry", "Sorry", "Justin Biber");
+var STICHES = new Song("stiches", "Stiches", "Shawn Mendes")
+var SWIFT = new Song("swift", "Blank Space", "Taylor Swift");
+var TIGER = new Song("tiger", "Eye of the Tiger", "Suvivor")
+var VILLAGE = new Song("village", "Village People", "YMCA");
+var VIVA = new Song("viva", "Viva la Vida", "Coldplay");
+var GANGAN = new Song("gangan", "Gangnam Style", "PSY");
 
 var currMusic: Song;
+setCmdDir();
 
 /*
  * Routes
@@ -151,13 +152,28 @@ io.on('connection', function (socket) {
     })
 })
 
-var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 25, 24, 23, 18, 15, 14];
+var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 0, 7, 8, 0, 25, 24, 0, 23, 18, 0, 15, 14];
 
 function writePin(pin: number, value: number) {
     exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
         if (error != null) {
             console.log('exec error: ' + error);
         }
+    });
+}
+
+
+
+function setCmdDir() {
+    exec("cd PIGPIO", function (error, stdout, stderr) {
+        if (error != null) console.log('exec error: ' + error);
+        else startPigs();
+    });
+}
+
+function startPigs() {
+    exec("sudo pigpiod", function (error, stdout, stderr) {
+        if (error != null) console.log('exec error: ' + error);
     });
 }
 

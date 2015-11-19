@@ -25,9 +25,9 @@ var Play;
         if (currentMusic != null)
             return;
         DummyFF.createDummy();
-        Keyboard.listenForKeysCustom(keyDown, null);
         currTime = 0;
-        audio.loadAudio(name, music[name].audio);
+        if (audio.getAudio(name) == null)
+            audio.loadAudio(name, music[name].audio);
         currentMusic = audio.getAudio(name);
         setTimeout(function () { loadMusicFile("music/" + name + ".ff"); }, 2000);
     }
@@ -92,7 +92,7 @@ var Play;
         for (var i = 0; i < musicData.length; i++) {
             var time = parseInt(musicData[i]);
             var zone = getZone(occupied, currLoc, time, 0);
-            var player = zone == -1 ? -1 : getPlayer(busy, players, time, 0);
+            var player = zone == -1 ? -1 : getPlayer(busy, zone, players, time, 0);
             if (player >= 0) {
                 musc.enqueue(new MusicEvent(time, zone, player));
                 busy[player] = time + (noteSpeed * (players == 1 ? 1 : (4 / 3)));
@@ -112,12 +112,14 @@ var Play;
             return getZone(occupied, currLoc, time, ittrs + 1);
         return zoneQuess;
     }
-    function getPlayer(busy, players, time, ittrs) {
+    function getPlayer(busy, zone, players, time, ittrs) {
         if (ittrs == 100)
             return -1;
         var playerGuess = MMath.random(0, players);
+        if (zone == 9 && playerGuess == 2 || zone == 8 && playerGuess == 1 || zone == 7 && playerGuess == 0 || zone == 6 && playerGuess == 2)
+            return getPlayer(busy, zone, players, time, ittrs + 1);
         if (busy[playerGuess] > time)
-            return getPlayer(busy, players, time, ittrs + 1);
+            return getPlayer(busy, zone, players, time, ittrs + 1);
         return playerGuess;
     }
     function decompOptions(options, option) {
@@ -158,7 +160,7 @@ var DummyFF;
     var shader;
     var STRIP_COUNT = Play.ZONES;
     function createDummy() {
-        QuickGL.initGL(setup, loop, window.innerWidth - 125, 99, 100, 100, [0, 0, 0, 1]);
+        QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
     }
     DummyFF.createDummy = createDummy;
     function setup() {
@@ -248,6 +250,7 @@ var POMPEII = new Song("popeii", "Pompeii");
 $(document).ready(init);
 function init() {
     startIntro();
+    Keyboard.listenForKeys();
     requestAccess();
 }
 /*
