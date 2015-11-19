@@ -24,7 +24,6 @@ var Play;
     function playMusic(name) {
         if (currentMusic != null)
             return;
-        DummyFF.createDummy();
         currTime = 0;
         if (audio.getAudio(name) == null)
             audio.loadAudio(name, music[name].audio);
@@ -149,44 +148,7 @@ var Play;
         return Play.colors.apply(player);
     }
 })(Play || (Play = {}));
-/*
- * Dummy output (will be replaced by real life stuff)
- */
-var DummyFF;
-(function (DummyFF) {
-    var lines = new MutableList();
-    var color = [];
-    var render;
-    var shader;
-    var STRIP_COUNT = Play.ZONES;
-    function createDummy() {
-        QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
-    }
-    DummyFF.createDummy = createDummy;
-    function setup() {
-        shader = QuickGL.createShader(QuickGL.ShaderType.COLOR);
-        shader.matrix.setProjectionMatrix(Matrix4.ortho(0, 300, 300, 0));
-        render = new QuickGL.SIPRender(shader, QuickGL.StartType.ONCE);
-        lines.clear();
-        for (var i = 0; i < STRIP_COUNT; i++) {
-            lines.insert(Geometry.line(Geometry.point(150 + Math.cos(MMath.toRad(i * (360 / STRIP_COUNT))) * 10, 150 + Math.sin(MMath.toRad(i * (360 / STRIP_COUNT))) * 10), Geometry.point(150 + Math.cos(MMath.toRad(i * (360 / STRIP_COUNT))) * 125, 150 + Math.sin(MMath.toRad(i * (360 / STRIP_COUNT))) * 125)));
-        }
-    }
-    function setColor(nwColor, index) {
-        color[index] = nwColor;
-    }
-    DummyFF.setColor = setColor;
-    function loop() {
-        GLF.clearBufferColor();
-        for (var i = 0; i < lines.size(); i++) {
-            var nwColor = color[i];
-            if (nwColor == null)
-                nwColor = [1, 1, 1];
-            render.setColorV3(nwColor);
-            render.line(lines.apply(i));
-        }
-    }
-})(DummyFF || (DummyFF = {}));
+
 /*
  * Connects the program to light output.
  */
@@ -195,8 +157,7 @@ var FFInterface;
     var NUM_ZONES = Play.ZONES;
     function powerZone(color, zone) {
         //dummy (disable when on pi)
-        DummyFF.setColor(Play.colors.apply(color), zone);
-        DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
+
         //pi
         setPin(zone * 3 + color, 255);
         setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 255);
@@ -204,8 +165,7 @@ var FFInterface;
     FFInterface.powerZone = powerZone;
     function releaseZone(zone, color) {
         //dummy (disable when on pi)
-        DummyFF.setColor(null, zone);
-        DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
+
         //pi
         setPin(zone * 3 + color, 0);
         setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 0);
