@@ -132,7 +132,7 @@ module Play {
     function getPlayer(busy: number[], zone:number, players: number, time: number, ittrs: number):number {
         if (ittrs == 100) return -1;
         var playerGuess = MMath.random(0, players);
-        if (zone == 9 && playerGuess != 0 || zone == 8 && playerGuess != 2 || zone == 7 && playerGuess != 1 || zone == 6 && playerGuess == 2) return getPlayer(busy, zone, players, time, ittrs + 1);
+        if ((zone == 9 && playerGuess == 2) || (zone == 8 && playerGuess != 0) || (zone == 7 && playerGuess != 2) || (zone == 6 && playerGuess != 1) || (zone == 5 && playerGuess == 2)) return getPlayer(busy, zone, players, time, ittrs + 1);
         if (busy[playerGuess] > time) return getPlayer(busy, zone, players, time, ittrs+1);
         return playerGuess;
     }
