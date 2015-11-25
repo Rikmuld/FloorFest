@@ -59,6 +59,7 @@ var TIGER = new Song("tiger", "Eye of the Tiger", "Suvivor");
 var VILLAGE = new Song("village", "Village People", "YMCA");
 var VIVA = new Song("viva", "Viva la Vida", "Coldplay");
 var GANGAN = new Song("gangan", "Gangnam Style", "PSY");
+var POMPEII = new Song("popeii", "Pompeii", "Bastille");
 var currMusic;
 setCmdDir();
 /*
@@ -139,7 +140,7 @@ io.on('connection', function (socket) {
         });
     });
 });
-var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 0, 7, 8, 0, 25, 24, 0, 23, 18, 0, 15, 14];
+var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 0, 0, 25, 24, 18, 0, 23, 15, 14, 0];
 function writePin(pin, value) {
     exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
         if (error != null) {
