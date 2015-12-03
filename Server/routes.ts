@@ -178,13 +178,11 @@ io.on('connection', function (socket) {
     socket.on(I_SET_PIN, writePin);
     socket.on(I_READ_FILE, function (name: string) {
         fs.readFile(path.join(__dirname, 'public') + "/" + name, "utf8", function (err, data) {
-            console.log(err, data)
             socket.emit(O_READ_FILE, data);
         })
     })
     socket.on(I_ZONE_OCUP, function (zone: number) {
         zoneOccupied(zone)
-        console.log(zone)
     })
 })
 

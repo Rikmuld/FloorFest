@@ -165,13 +165,11 @@ io.on('connection', function (socket) {
     socket.on(I_SET_PIN, writePin);
     socket.on(I_READ_FILE, function (name) {
         fs.readFile(path.join(__dirname, 'public') + "/" + name, "utf8", function (err, data) {
-            console.log(err, data);
             socket.emit(O_READ_FILE, data);
         });
     });
     socket.on(I_ZONE_OCUP, function (zone) {
         zoneOccupied(zone);
-        console.log(zone);
     });
 });
 var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 0, 0, 25, 24, 18, 0, 23, 15, 14, 0];
