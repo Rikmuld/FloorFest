@@ -112,7 +112,7 @@ var I_ZONE_OCUP = "zone_ocup_req"
 var O_ZONE_OCUP = "zone_ocup_res"
 
 var SerialPort = require("serialport").SerialPort
-var serial = new SerialPort("/dev/ttyUSB0", {
+var serial = new SerialPort("/dev/ttyACM0", {
     baudrate: 9600,
     dataBits: 8,
     parity: 'none',
