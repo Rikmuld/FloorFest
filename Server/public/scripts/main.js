@@ -24,7 +24,7 @@ var Play;
     function playMusic(name) {
         if (currentMusic != null)
             return;
-        //DummyFF.createDummy();
+        DummyFF.createDummy();
         currTime = 0;
         if (audio.getAudio(name) == null)
             audio.loadAudio(name, music[name].audio);
@@ -89,14 +89,17 @@ var Play;
         var busy = new Array(players);
         var occupied = new Array(Play.ZONES);
         var currLoc = new Array(players);
+        var lastPlayer = -1;
         for (var i = 0; i < musicData.length; i++) {
             var time = parseInt(musicData[i]);
-            var zone = getZone(occupied, currLoc, time, 0);
-            var player = zone == -1 ? -1 : getPlayer(busy, zone, players, time, 0);
+            var data = getPlayer(busy, occupied, currLoc, players, lastPlayer, time, 0);
+            var player = data[0];
+            var zone = data[1];
             if (player >= 0) {
                 musc.enqueue(new MusicEvent(time, zone, player));
                 busy[player] = time + (noteSpeed * (players == 1 ? 1 : (4 / 3)));
                 currLoc[player] = zone;
+                lastPlayer = player;
                 occupied[zone] = time + (noteSpeed * 4) / 3;
             }
         }
@@ -112,15 +115,15 @@ var Play;
             return getZone(occupied, currLoc, time, ittrs + 1);
         return zoneQuess;
     }
-    function getPlayer(busy, zone, players, time, ittrs) {
-        if (ittrs == 100)
-            return -1;
+    function getPlayer(busy, occupied, currLoc, players, lastPlayer, time, ittrs) {
+        var zone = getZone(occupied, currLoc, time, 0);
+        if (ittrs == 100 || zone == -1)
+            return [-1, -1];
         var playerGuess = MMath.random(0, players);
-        if ((zone == 9 && playerGuess == 2) || (zone == 8 && playerGuess != 0) || (zone == 7 && playerGuess != 2) || (zone == 6 && playerGuess != 1) || (zone == 5 && playerGuess == 2))
-            return getPlayer(busy, zone, players, time, ittrs + 1);
-        if (busy[playerGuess] > time)
-            return getPlayer(busy, zone, players, time, ittrs + 1);
-        return playerGuess;
+        if (playerGuess == lastPlayer, busy[playerGuess] > time || (zone == 9 && playerGuess == 2) || (zone == 8 && playerGuess != 0) || (zone == 7 && playerGuess != 2) || (zone == 6 && playerGuess != 1) || (zone == 5 && playerGuess == 2)) {
+            return getPlayer(busy, occupied, currLoc, players, lastPlayer, time, ittrs + 1);
+        }
+        return [playerGuess, zone];
     }
     function decompOptions(options, option) {
         var split;
@@ -160,7 +163,7 @@ var DummyFF;
     var shader;
     var STRIP_COUNT = Play.ZONES;
     function createDummy() {
-        //QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
+        QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
     }
     DummyFF.createDummy = createDummy;
     function setup() {
@@ -195,8 +198,8 @@ var FFInterface;
     var NUM_ZONES = Play.ZONES;
     function powerZone(color, zone) {
         //dummy (disable when on pi)
-        //DummyFF.setColor(Play.colors.apply(color), zone);
-        //DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
+        DummyFF.setColor(Play.colors.apply(color), zone);
+        DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
         //pi
         setPin(zone * 3 + color, 255);
         setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 255);
@@ -204,8 +207,8 @@ var FFInterface;
     FFInterface.powerZone = powerZone;
     function releaseZone(zone, color) {
         //dummy (disable when on pi)
-        //DummyFF.setColor(null, zone);
-        //DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
+        DummyFF.setColor(null, zone);
+        DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
         //pi
         setPin(zone * 3 + color, 0);
         setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 0);

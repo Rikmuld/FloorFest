@@ -74,7 +74,7 @@ var GANGAN = new Song("gangan", "Gangnam Style", "PSY");
 var POMPEII = new Song("popeii", "Pompeii", "Bastille");
 
 var currMusic: Song;
-setCmdDir();
+startPigs();
 
 /*
  * Routes
@@ -108,6 +108,34 @@ var O_PLAYER_SET_CLIENT = "player_set_client"
 var I_READ_FILE = "file_read"
 var O_READ_FILE = "file_read_get"
 var I_SET_PIN = "set_pin"
+var I_ZONE_OCUP = "zone_ocup_req"
+var O_ZONE_OCUP = "zone_ocup_res"
+
+var SerialPort = require("serialport").SerialPort
+var serial = new SerialPort("/dev/ttyUSB0", {
+    baudrate: 115200
+});
+var serialConnect: boolean = false;
+
+serial.on("open", function () {
+    serialConnect = true;
+    console.log('Connected to USB serial device!');
+    serial.on('data', function (data) {
+        console.log('data received: ' + data);
+    });
+    serial.write("ls\n", function (err, results) {
+        console.log('err ' + err);
+        console.log('results ' + results);
+    });
+});
+
+function zoneOccupied(zone: number, callback:(zone:number, result:boolean)=>void) {
+    if (serialConnect) {
+        serial.write("zone_" + zone, function (error, results) {
+            callback(zone, results=="true");
+        })
+    }
+}
 
 io.on('connection', function (socket) {
     socket.join(ROOM);
@@ -151,24 +179,22 @@ io.on('connection', function (socket) {
             socket.emit(O_READ_FILE, data);
         })
     })
+    //socket.on(I_ZONE_OCUP, function (zone: number) {
+    //    zoneOccupied(zone, returnZone)
+    //})
 })
 
 var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 0, 0, 25, 24, 18, 0, 23, 15, 14, 0];
+
+function returnZone(zone: number, ocup: boolean) {
+    socket.emit(O_ZONE_OCUP, zone, ocup);
+}
 
 function writePin(pin: number, value: number) {
     exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
         if (error != null) {
             console.log('exec error: ' + error);
         }
-    });
-}
-
-
-
-function setCmdDir() {
-    exec("cd PIGPIO", function (error, stdout, stderr) {
-        if (error != null) console.log('exec error: ' + error);
-        else startPigs();
     });
 }
 
