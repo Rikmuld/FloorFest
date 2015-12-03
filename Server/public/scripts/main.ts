@@ -30,7 +30,7 @@ module Play {
     export function playMusic(name: string) {
         if (currentMusic != null) return;
 
-        DummyFF.createDummy();
+        //DummyFF.createDummy();
 
         currTime = 0;
 
@@ -187,7 +187,7 @@ module DummyFF {
     var STRIP_COUNT = Play.ZONES;
 
     export function createDummy() {
-        QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
+        //QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
     }
 
     function setup() {
@@ -208,7 +208,7 @@ module DummyFF {
     }
 
     function loop() {
-        GLF.clearBufferColor();
+        //GLF.clearBufferColor();
         for (var i = 0; i < lines.size(); i++) {
             var nwColor = color[i];
             if (nwColor == null) nwColor = [1, 1, 1];
@@ -226,8 +226,8 @@ module FFInterface {
 
     export function powerZone(color: number, zone: number) {
         //dummy (disable when on pi)
-        DummyFF.setColor(Play.colors.apply(color), zone);
-        DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
+        //DummyFF.setColor(Play.colors.apply(color), zone);
+        //DummyFF.setColor(Play.colors.apply(color), MMath.mod(zone + 1, NUM_ZONES));
         //pi
         setPin(zone * 3 + color, 255);
         setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 255);
@@ -235,8 +235,8 @@ module FFInterface {
 
     export function releaseZone(zone: number, color:number) {
         //dummy (disable when on pi)
-        DummyFF.setColor(null, zone);
-        DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
+        //DummyFF.setColor(null, zone);
+        //DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
         //pi
         setPin(zone * 3 + color, 0);
         setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 0);

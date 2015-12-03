@@ -93,7 +93,11 @@ var I_ZONE_OCUP = "zone_ocup_req";
 var O_ZONE_OCUP = "zone_ocup_res";
 var SerialPort = require("serialport").SerialPort;
 var serial = new SerialPort("/dev/ttyUSB0", {
-    baudrate: 115200
+    baudrate: 9600,
+    dataBits: 8,
+    parity: 'none',
+    stopBits: 1,
+    flowControl: false
 });
 var serialConnect = false;
 serial.on("open", function () {
@@ -103,7 +107,8 @@ serial.on("open", function () {
         console.log('data received: ' + data);
     });
     serial.write("ls\n", function (err, results) {
-        console.log('err ' + err);
+        if (err)
+            console.log('err ' + err);
         console.log('results ' + results);
     });
 });
@@ -164,9 +169,9 @@ io.on('connection', function (socket) {
             socket.emit(O_READ_FILE, data);
         });
     });
-    //socket.on(I_ZONE_OCUP, function (zone: number) {
-    //    zoneOccupied(zone, returnZone)
-    //})
+    socket.on(I_ZONE_OCUP, function (zone) {
+        zoneOccupied(zone, returnZone);
+    });
 });
 var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 0, 0, 25, 24, 18, 0, 23, 15, 14, 0];
 function returnZone(zone, ocup) {
