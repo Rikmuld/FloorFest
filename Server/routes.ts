@@ -109,7 +109,7 @@ var I_READ_FILE = "file_read"
 var O_READ_FILE = "file_read_get"
 var I_SET_PIN = "set_pin"
 var I_ZONE_OCUP = "zone_ocup_req"
-var O_ZONE_OCUP = "zone_ocup_res"
+var O_ZONE_OCUP = "scoreAdd"
 
 var SerialPort = require("serialport").SerialPort
 var serial = new SerialPort("/dev/ttyACM0", {
@@ -125,18 +125,17 @@ serial.on("open", function () {
     serialConnect = true;
     console.log('Connected to USB serial device!');
     serial.on('data', function (data) {
-        console.log('data received: ' + data);
-    });
-    serial.write("ls\n", function (err, results) {
-        if(err)console.log('err ' + err);
-        console.log('results ' + results);
+        console.log('Score add: ' + data);
+        if (data == "1") scoreAdd();
     });
 });
 
-function zoneOccupied(zone: number, callback:(zone:number, result:boolean)=>void) {
+function zoneOccupied(zone: number) {
     if (serialConnect) {
-        serial.write("zone_" + zone, function (error, results) {
-            callback(zone, results=="true");
+        serial.write(zone, function (error, results) {
+            console.log("curuious")
+            if(error)console.log(error)
+            console.log(results)
         })
     }
 }
@@ -184,14 +183,15 @@ io.on('connection', function (socket) {
         })
     })
     socket.on(I_ZONE_OCUP, function (zone: number) {
-        zoneOccupied(zone, returnZone)
+        zoneOccupied(zone)
+        console.log(zone)
     })
 })
 
 var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 0, 0, 25, 24, 18, 0, 23, 15, 14, 0];
 
-function returnZone(zone: number, ocup: boolean) {
-    socket.emit(O_ZONE_OCUP, zone, ocup);
+function scoreAdd() {
+    socket.emit(O_ZONE_OCUP);
 }
 
 function writePin(pin: number, value: number) {

@@ -53,38 +53,23 @@ html {
 ::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-corner,
 ::-webkit-resizer,
+#score {
+  font-size: 24px;
+  font-family: exo;
+  top: 45px;
+  position: absolute;
+}
 .navBl {
   color: #fff;
   font-family: exo;
   font-size: 30px;
 }
-::-webkit-scrollbar i,
-::-webkit-scrollbar-button i,
-::-webkit-scrollbar-track i,
-::-webkit-scrollbar-track-piece i,
-::-webkit-scrollbar-thumb i,
-::-webkit-scrollbar-corner i,
-::-webkit-resizer i,
 .navBl i {
   font-size: 28px;
 }
-::-webkit-scrollbar .head,
-::-webkit-scrollbar-button .head,
-::-webkit-scrollbar-track .head,
-::-webkit-scrollbar-track-piece .head,
-::-webkit-scrollbar-thumb .head,
-::-webkit-scrollbar-corner .head,
-::-webkit-resizer .head,
 .navBl .head {
   float: left;
 }
-::-webkit-scrollbar .tail,
-::-webkit-scrollbar-button .tail,
-::-webkit-scrollbar-track .tail,
-::-webkit-scrollbar-track-piece .tail,
-::-webkit-scrollbar-thumb .tail,
-::-webkit-scrollbar-corner .tail,
-::-webkit-resizer .tail,
 .navBl .tail {
   float: right;
 }

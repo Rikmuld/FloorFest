@@ -21,6 +21,7 @@ module Play {
     var score: number;
     var audio: AudioManager = new AudioManager();
     export var numOfPlayers: number;
+    var songLength: number;
 
     export function setNumOfPlayers(players: number) {
         numOfPlayers = players;
@@ -45,6 +46,11 @@ module Play {
         currentMusic.play();
         run(null);
         updateMusicProg();
+    }
+
+    export function scoreAdd() {
+        score += (1 / songLength) * 1000000;
+        setText(SCORE, "Score: " + score);
     }
 
     function keyDown(event) {
@@ -97,6 +103,7 @@ module Play {
 
         var musicData = notes.split(",");
         var musc = new Queue<MusicEvent>();
+        songLength = musicData.length;
         var seed = 5 * music.length + 3 * music.indexOf("a") + 4 * music.indexOf("o") + 2 * music.indexOf("u") + 7 * music.indexOf("i") + 3 * music.indexOf("e");
         MMath.setRandomSeed(seed);
 
@@ -238,6 +245,8 @@ module FFInterface {
         //DummyFF.setColor(null, zone);
         //DummyFF.setColor(null, MMath.mod(zone + 1, NUM_ZONES));
         //pi
+
+        zoneOcupied(zone);
         setPin(zone * 3 + color, 0);
         setPin(MMath.mod(zone + 1, NUM_ZONES) * 3 + color, 0);
     }
@@ -347,6 +356,8 @@ var O_PLAYER_SET = "player_set"
 var O_READ_FILE = "file_read"
 var I_READ_FILE = "file_read_get"
 var O_SET_PIN = "set_pin"
+var I_ZONE_OCUP = "scoreAdd"
+var O_ZONE_OCUP = "zone_ocup_req"
 
 var socket = io();
 var currentFrame: string;
@@ -357,6 +368,11 @@ socket.on(I_FRAME_RESPONS, responseFrame)
 socket.on(I_MUSIC_START, Play.playMusic)
 socket.on(I_READ_FILE, Play.musicFileCalback)
 socket.on(I_PLAYER_SET_CLIENT, Play.setNumOfPlayers)
+socket.on(I_ZONE_OCUP, Play.scoreAdd)
+
+function zoneOcupied(zone: number) {
+    socket.emit(O_ZONE_OCUP, zone);
+}
 
 function setPin(pin: number, value:number) {
     socket.emit(O_SET_PIN, pin, value);
@@ -434,6 +450,7 @@ var MUSIC_COVER = ".coverbox"
 var HEADER_ICON = "#headerIcon"
 var HEADER_TEXT = "#logo"
 var MUSIC_PROG = "#musicProg-bar";
+var SCORE = "#score";
 
 function setMusicProg(current: number, total: number) {
     var value = ((current / total) * 100).toString() + "%"
