@@ -181,11 +181,11 @@ function scoreAdd() {
     askSocket.emit(O_ZONE_OCUP);
 }
 function writePin(pin, value) {
-    //exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
-    //   if (error != null) {
-    //       console.log('exec error: ' + error);
-    //   }
-    //});
+    exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
+        if (error != null) {
+            console.log('exec error: ' + error);
+        }
+    });
 }
 function startPigs() {
     exec("sudo pigpiod", function (error, stdout, stderr) {

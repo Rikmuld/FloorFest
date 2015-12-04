@@ -199,11 +199,11 @@ function scoreAdd() {
 }
 
 function writePin(pin: number, value: number) {
-    //exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
-     //   if (error != null) {
-     //       console.log('exec error: ' + error);
-     //   }
-    //});
+    exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
+        if (error != null) {
+            console.log('exec error: ' + error);
+        }
+    });
 }
 
 function startPigs() {
