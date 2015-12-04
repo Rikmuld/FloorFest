@@ -18,7 +18,7 @@ module Play {
     var noteSpeed: number;
     var currTime: number;
     var song: string;
-    var score: number;
+    var score: number = 0;
     var audio: AudioManager = new AudioManager();
     export var numOfPlayers: number;
     var songLength: number;
@@ -33,7 +33,9 @@ module Play {
 
         //DummyFF.createDummy();
 
+        hide(FINAL_SCORE)
         currTime = 0;
+        score = 0;
 
         if (audio.getAudio(name) == null) audio.loadAudio(name, music[name].audio);
         currentMusic = audio.getAudio(name);
@@ -49,8 +51,9 @@ module Play {
     }
 
     export function scoreAdd() {
+        console.log(songLength)
         score += (1 / songLength) * 1000000;
-        setText(SCORE, "Score: " + score);
+        setText(SCORE, "Score: " + score.toFixed(0));
     }
 
     function keyDown(event) {
@@ -60,10 +63,30 @@ module Play {
     }
 
     export function kill() {
+        var score = (score / 10000).toFixed(0);
+        setText(FINAL_SCORE_TEXT, "" + score + "% " + musicText(score));
+
+        setTimeout(function () {
+            fadeOut(MUSIC_COVER, 2500, function () {
+                fadeIn(FINAL_SCORE, 500)
+            })
+        }, 1000);
+
         currentMusic.pause();
         currentMusic.time(0);
         currentMusic = null;
         document.body.removeChild(document.body.lastChild);
+    }
+
+    function musicText(score: number): string {
+        if (score < 50) return "FAIL!";
+        else if (score < 70) return "Try Harder!";
+        else if (score < 80) return "Decent!";
+        else if (score < 90) return "Good Job!";
+        else if (score < 95) return "Well Done!";
+        else if (score < 99) return "Great Job!";
+        else if (score < 100) return "Amazing!";
+        else if (score == 100) return "Perfect!";
     }
 
     function updateMusicProg() {
@@ -81,7 +104,7 @@ module Play {
         }
 
         if (currentMusic.audio.ended) {
-            cencelMusic();
+            kill();
             return;
         }
 
@@ -94,6 +117,10 @@ module Play {
         }
     }
 
+    function showMusicList() {
+        cencelMusic(true);
+    }
+
     function loadSong(music: string, players: number): Queue<MusicEvent> {
         var options = music.split("&");
 
@@ -103,7 +130,7 @@ module Play {
 
         var musicData = notes.split(",");
         var musc = new Queue<MusicEvent>();
-        songLength = musicData.length;
+        songLength = 0;
         var seed = 5 * music.length + 3 * music.indexOf("a") + 4 * music.indexOf("o") + 2 * music.indexOf("u") + 7 * music.indexOf("i") + 3 * music.indexOf("e");
         MMath.setRandomSeed(seed);
 
@@ -120,6 +147,7 @@ module Play {
             var zone = data[1]
 
             if (player >= 0) {
+                songLength += 1;
                 musc.enqueue(new MusicEvent(time, zone, player));
 
                 busy[player] = time + (noteSpeed * (players == 1 ? 1 : (4 / 3)));
@@ -194,7 +222,7 @@ module DummyFF {
     var STRIP_COUNT = Play.ZONES;
 
     export function createDummy() {
-        //QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
+        QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
     }
 
     function setup() {
@@ -215,7 +243,7 @@ module DummyFF {
     }
 
     function loop() {
-        //GLF.clearBufferColor();
+        GLF.clearBufferColor();
         for (var i = 0; i < lines.size(); i++) {
             var nwColor = color[i];
             if (nwColor == null) nwColor = [1, 1, 1];
@@ -400,6 +428,7 @@ function responseFrame(id:string, frame, song?:string, img?:string) {
         css(MUSIC_COVER, "background-image", "Url(image/" + img + ")")
         setHeaderText("Now playing: " + music[song].name);
         setHeaderIcon(ICON_CENCEL);
+        kill(FINAL_SCORE);
     } else {
         setHeaderText("FloorFest");
         setHeaderIcon(ICON_USERS);
@@ -426,10 +455,12 @@ function playMusic(name: string) {
     requestFrame(FRAME_MUSIC);
 }
 
-function cencelMusic() {
+function cencelMusic(notKillMusic?:boolean) {
     socket.emit(O_MUSIC_SET, null);
     requestFrame(FRAME_SELECT);
-    Play.kill();
+    if (typeof notKillMusic == "undefined" || notKillMusic == false) {
+        Play.kill();
+    }
 }
 
 /*
@@ -451,6 +482,9 @@ var HEADER_ICON = "#headerIcon"
 var HEADER_TEXT = "#logo"
 var MUSIC_PROG = "#musicProg-bar";
 var SCORE = "#score";
+var FINAL_SCORE = "#hideOnPlay";
+var MUSIC_COVER = ".coverbox";
+var FINAL_SCORE_TEXT = ".finalscoreText";
 
 function setMusicProg(current: number, total: number) {
     var value = ((current / total) * 100).toString() + "%"
@@ -481,11 +515,19 @@ function fadeOut(id: string, time, callback?: () => void) {
     $(id).fadeOut(time, callback);
 }
 
+function fadeIn(id: string, time, callback?: () => void) {
+    $(id).fadeIn(time, callback);
+}
+
 function animate(id: string, animation, time, callback?: () => void) {
     $(id).animate(animation, time, "", callback);
 }
 
 function kill(id: string) {
+    $(id).hide();
+}
+
+function hide(id: string) {
     $(id).hide();
 }
 

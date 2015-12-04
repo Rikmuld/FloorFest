@@ -92,7 +92,7 @@ var I_SET_PIN = "set_pin";
 var I_ZONE_OCUP = "zone_ocup_req";
 var O_ZONE_OCUP = "scoreAdd";
 var SerialPort = require("serialport").SerialPort;
-var serial = new SerialPort("/dev/ttyACM0", {
+var serial = new SerialPort("COM5", {
     baudrate: 9600,
     dataBits: 8,
     parity: 'none',
@@ -100,25 +100,28 @@ var serial = new SerialPort("/dev/ttyACM0", {
     flowControl: false
 });
 var serialConnect = false;
+var dataGot = '';
 serial.on("open", function () {
     serialConnect = true;
     console.log('Connected to USB serial device!');
     serial.on('data', function (data) {
-        console.log('Score add: ' + data);
-        if (data == "1")
-            scoreAdd();
+        dataGot += data.toString();
+        if (dataGot.indexOf("S") >= 0 && dataGot.lastIndexOf("E") >= 0) {
+            var allData = dataGot.split("E");
+            onArduinoData(allData[0].split("S")[1]);
+            dataGot = allData[1];
+        }
     });
 });
-function zoneOccupied(zone) {
-    if (serialConnect) {
-        serial.write(zone, function (error, results) {
-            console.log("curuious");
-            if (error)
-                console.log(error);
-            console.log(results);
-        });
-    }
+function onArduinoData(data) {
+    console.log("DATA: " + data);
+    scoreAdd();
 }
+function zoneOccupied(zone) {
+    if (serialConnect)
+        serial.write("" + zone);
+}
+var askSocket;
 io.on('connection', function (socket) {
     socket.join(ROOM);
     if (controlerId == null || Object.keys(io.nsps['/'].adapter.rooms[ROOM]).length == 1)
@@ -170,18 +173,19 @@ io.on('connection', function (socket) {
     });
     socket.on(I_ZONE_OCUP, function (zone) {
         zoneOccupied(zone);
+        askSocket = socket;
     });
 });
 var pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 5, 6, 13, 19, 26, 21, 20, 16, 12, 7, 8, 0, 0, 25, 24, 18, 0, 23, 15, 14, 0];
 function scoreAdd() {
-    socket.emit(O_ZONE_OCUP);
+    askSocket.emit(O_ZONE_OCUP);
 }
 function writePin(pin, value) {
-    exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
-        if (error != null) {
-            console.log('exec error: ' + error);
-        }
-    });
+    //exec("pigs p " + pins[pin] + " " + value, function (error, stdout, stderr) {
+    //   if (error != null) {
+    //       console.log('exec error: ' + error);
+    //   }
+    //});
 }
 function startPigs() {
     exec("sudo pigpiod", function (error, stdout, stderr) {

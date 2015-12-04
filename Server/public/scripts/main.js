@@ -13,9 +13,8 @@ var Play;
     var noteSpeed;
     var currTime;
     var song;
-    var score;
+    var score = 0;
     var audio = new AudioManager();
-    Play.numOfPlayers;
     var songLength;
     function setNumOfPlayers(players) {
         Play.numOfPlayers = players;
@@ -26,7 +25,9 @@ var Play;
         if (currentMusic != null)
             return;
         //DummyFF.createDummy();
+        hide(FINAL_SCORE);
         currTime = 0;
+        score = 0;
         if (audio.getAudio(name) == null)
             audio.loadAudio(name, music[name].audio);
         currentMusic = audio.getAudio(name);
@@ -41,8 +42,9 @@ var Play;
     }
     Play.musicFileCalback = musicFileCalback;
     function scoreAdd() {
+        console.log(songLength);
         score += (1 / songLength) * 1000000;
-        setText(SCORE, "Score: " + score);
+        setText(SCORE, "Score: " + score.toFixed(0));
     }
     Play.scoreAdd = scoreAdd;
     function keyDown(event) {
@@ -51,12 +53,37 @@ var Play;
         }
     }
     function kill() {
+        var score = (score / 10000).toFixed(0);
+        setText(FINAL_SCORE_TEXT, "" + score + "% " + musicText(score));
+        setTimeout(function () {
+            fadeOut(MUSIC_COVER, 2500, function () {
+                fadeIn(FINAL_SCORE, 500);
+            });
+        }, 1000);
         currentMusic.pause();
         currentMusic.time(0);
         currentMusic = null;
         document.body.removeChild(document.body.lastChild);
     }
     Play.kill = kill;
+    function musicText(score) {
+        if (score < 50)
+            return "FAIL!";
+        else if (score < 70)
+            return "Try Harder!";
+        else if (score < 80)
+            return "Decent!";
+        else if (score < 90)
+            return "Good Job!";
+        else if (score < 95)
+            return "Well Done!";
+        else if (score < 99)
+            return "Great Job!";
+        else if (score < 100)
+            return "Amazing!";
+        else if (score == 100)
+            return "Perfect!";
+    }
     function updateMusicProg() {
         if (currentMusic == null || currentMusic.audio.ended)
             return;
@@ -71,7 +98,7 @@ var Play;
             setTimeout(function () { FFInterface.releaseZone(event.zone, event.color); }, noteSpeed * 100);
         }
         if (currentMusic.audio.ended) {
-            cencelMusic();
+            kill();
             return;
         }
         var eventNext = currentSong.dequeue();
@@ -83,6 +110,9 @@ var Play;
             setTimeout(function () { run(eventNext); }, sleepTime);
         }
     }
+    function showMusicList() {
+        cencelMusic(true);
+    }
     function loadSong(music, players) {
         var options = music.split("&");
         var speed = decompOptions(options, MusicOptions.SPEED);
@@ -90,7 +120,7 @@ var Play;
         noteSpeed = parseInt(speed);
         var musicData = notes.split(",");
         var musc = new Queue();
-        songLength = musicData.length;
+        songLength = 0;
         var seed = 5 * music.length + 3 * music.indexOf("a") + 4 * music.indexOf("o") + 2 * music.indexOf("u") + 7 * music.indexOf("i") + 3 * music.indexOf("e");
         MMath.setRandomSeed(seed);
         var busy = new Array(players);
@@ -103,6 +133,7 @@ var Play;
             var player = data[0];
             var zone = data[1];
             if (player >= 0) {
+                songLength += 1;
                 musc.enqueue(new MusicEvent(time, zone, player));
                 busy[player] = time + (noteSpeed * (players == 1 ? 1 : (4 / 3)));
                 currLoc[player] = zone;
@@ -170,7 +201,7 @@ var DummyFF;
     var shader;
     var STRIP_COUNT = Play.ZONES;
     function createDummy() {
-        //QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
+        QuickGL.initGL(setup, loop, 25, 99, 500, 500, [0, 0, 0, 1]);
     }
     DummyFF.createDummy = createDummy;
     function setup() {
@@ -187,7 +218,7 @@ var DummyFF;
     }
     DummyFF.setColor = setColor;
     function loop() {
-        //GLF.clearBufferColor();
+        GLF.clearBufferColor();
         for (var i = 0; i < lines.size(); i++) {
             var nwColor = color[i];
             if (nwColor == null)
@@ -342,6 +373,7 @@ function responseFrame(id, frame, song, img) {
         css(MUSIC_COVER, "background-image", "Url(image/" + img + ")");
         setHeaderText("Now playing: " + music[song].name);
         setHeaderIcon(ICON_CENCEL);
+        kill(FINAL_SCORE);
     }
     else {
         setHeaderText("FloorFest");
@@ -366,10 +398,12 @@ function playMusic(name) {
     socket.emit(O_MUSIC_SET, name);
     requestFrame(FRAME_MUSIC);
 }
-function cencelMusic() {
+function cencelMusic(notKillMusic) {
     socket.emit(O_MUSIC_SET, null);
     requestFrame(FRAME_SELECT);
-    Play.kill();
+    if (typeof notKillMusic == "undefined" || notKillMusic == false) {
+        Play.kill();
+    }
 }
 /*
  * JQuerry, constants and helper methods
@@ -389,6 +423,9 @@ var HEADER_ICON = "#headerIcon";
 var HEADER_TEXT = "#logo";
 var MUSIC_PROG = "#musicProg-bar";
 var SCORE = "#score";
+var FINAL_SCORE = "#hideOnPlay";
+var MUSIC_COVER = ".coverbox";
+var FINAL_SCORE_TEXT = ".finalscoreText";
 function setMusicProg(current, total) {
     var value = ((current / total) * 100).toString() + "%";
     css(MUSIC_PROG, "width", value);
@@ -413,10 +450,16 @@ function setText(id, text) {
 function fadeOut(id, time, callback) {
     $(id).fadeOut(time, callback);
 }
+function fadeIn(id, time, callback) {
+    $(id).fadeIn(time, callback);
+}
 function animate(id, animation, time, callback) {
     $(id).animate(animation, time, "", callback);
 }
 function kill(id) {
+    $(id).hide();
+}
+function hide(id) {
     $(id).hide();
 }
 function show(id) {
