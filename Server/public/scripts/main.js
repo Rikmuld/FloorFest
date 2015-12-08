@@ -53,8 +53,8 @@ var Play;
         }
     }
     function kill() {
-        var score = (score / 10000).toFixed(0);
-        setText(FINAL_SCORE_TEXT, "" + score + "% " + musicText(score));
+        var scre = fixScore(parseInt((score / 10000).toFixed(0)));
+        setText(FINAL_SCORE_TEXT, "" + scre + "% " + musicText(scre));
         setTimeout(function () {
             fadeOut(MUSIC_COVER, 2500, function () {
                 fadeIn(FINAL_SCORE, 500);
@@ -66,23 +66,26 @@ var Play;
         document.body.removeChild(document.body.lastChild);
     }
     Play.kill = kill;
+    function fixScore(score) {
+        return Math.min(100, Math.sqrt(1.1738304539443973 + 103.95285000595457 * score));
+    }
     function musicText(score) {
         if (score < 50)
-            return "FAIL!";
+            return ", Fail!";
         else if (score < 70)
-            return "Try Harder!";
+            return ", Try Harder!";
         else if (score < 80)
-            return "Decent!";
+            return ", Decent!";
         else if (score < 90)
-            return "Good Job!";
+            return ", Good Job!";
         else if (score < 95)
-            return "Well Done!";
+            return ", Well Done!";
         else if (score < 99)
-            return "Great Job!";
+            return ", Great Job!";
         else if (score < 100)
-            return "Amazing!";
+            return ", Amazing!";
         else if (score == 100)
-            return "Perfect!";
+            return ", Perfect!";
     }
     function updateMusicProg() {
         if (currentMusic == null || currentMusic.audio.ended)

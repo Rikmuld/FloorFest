@@ -63,8 +63,8 @@ module Play {
     }
 
     export function kill() {
-        var score = (score / 10000).toFixed(0);
-        setText(FINAL_SCORE_TEXT, "" + score + "% " + musicText(score));
+        var scre = fixScore(parseInt((score / 10000).toFixed(0)));
+        setText(FINAL_SCORE_TEXT, "" + scre + "% " + musicText(scre));
 
         setTimeout(function () {
             fadeOut(MUSIC_COVER, 2500, function () {
@@ -78,15 +78,19 @@ module Play {
         document.body.removeChild(document.body.lastChild);
     }
 
+    function fixScore(score: number): number {
+        return Math.min(100, Math.sqrt(1.1738304539443973 + 103.95285000595457 * score));
+    }
+
     function musicText(score: number): string {
-        if (score < 50) return "FAIL!";
-        else if (score < 70) return "Try Harder!";
-        else if (score < 80) return "Decent!";
-        else if (score < 90) return "Good Job!";
-        else if (score < 95) return "Well Done!";
-        else if (score < 99) return "Great Job!";
-        else if (score < 100) return "Amazing!";
-        else if (score == 100) return "Perfect!";
+             if (score   < 50) return ", Fail!";
+        else if (score   < 70) return ", Try Harder!";
+        else if (score   < 80) return ", Decent!";
+        else if (score   < 90) return ", Good Job!";
+        else if (score   < 95) return ", Well Done!";
+        else if (score   < 99) return ", Great Job!";
+        else if (score  < 100) return ", Amazing!";
+        else if (score == 100) return ", Perfect!";
     }
 
     function updateMusicProg() {
